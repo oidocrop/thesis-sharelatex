@@ -57,7 +57,7 @@ By definition, a method is declared within a class, pointed by the {\tt declarin
 In this paragraph we describe how ART runtime invokes virtual-methods by choosing the virtual-method {\tt android.telephony.TelephonyManager}'s {\tt getDeviceId} as an example. Figure \ref{fig:es1} shows that the getDeviceId method is invoked on TelephonyManager object's class (line 4). Figure \ref{fig:oatdump} shows dumped compiled codes for arm architecture by \textit{oatdump} tool. 
 
 
-\begin{figure}[h!]
+\begin{figure}[H]
 \lstinputlisting[language=Java]{mysnippets/testcode.java}
 \caption{Call to method getDeviceId} 
 \label{fig:es1}
@@ -104,21 +104,14 @@ ARTDroid requires the root privilege in order to inject the hooking library in t
 
 Now, we explain the framework design in figures. Figure \ref{fig:design1} shows the app's memory layout without ARTDroid. The class \textit{TelephonyManager} is loaded within the boot image (boot.art). This Class contains both the \textit{vtable\_} and \textit{virtual\_methods\_} arrays where the pointer to method getDeviceId is stored. Instead, Figure \ref{fig:design2} represent the app's memory layout while ARTDroid hooking library is enabled. First, the hooking library is loaded inside the app's virtual memory (step 1), and then ARTDroid loads the user-defined patch code by DexClassLoader's methods (step 2). After this, ARTDroid uses its internal functions to retrive target methods reference. So, it can hook these methods by both {\tt vtable\_} and {\tt virtual\_methods\_} hijacking (step 3). \\
 
-%\begin{figure}[ht]
-%\centering
-%   \begin{subfigure}[b]{\columnwidth}
-%   \includegraphics[width=\columnwidth]{design1}
-%   \caption{ARTDroid not enabled}
-%   \label{fig:design1} 
-%	\end{subfigure}
-%	
-%	\begin{subfigure}[b]{\columnwidth}
-%   \includegraphics[width=\columnwidth]{design2}
-%   \caption{ARTDroid enabled}
-%   \label{fig:design2}
-%\end{subfigure}
-%\caption{App virtual memory layout}
-%\end{figure}
+\begin{figure}[H]
+\centering
+   \subfigure[ARTDroid not enabled]{\label{fig:design1}  
+   \includegraphics[width=\textwidth]{design1}}
+   \subfigure[ARTDroid enabled]{\label{fig:design2}
+   \includegraphics[width=\textwidth]{design2}}
+\caption{App virtual memory layout}
+\end{figure}
 
 
 
@@ -282,7 +275,7 @@ Recent works proposed novel approaches that aim to sandbox unmodified apps in no
 
 \section{Chapter Summary}
 \label{sec:conclusion}
-In this paper, we present ARTDroid, a framework for hooking virtual-methods under ART runtime. ARTDroid supports the virtual-method hooking without any modifications to both Android system and app's code. ARTDroid allows to analyze apps even if they employ anti-tampering techniques or they use either Java reflection or JNI to invoke virtual-methods. Moreover, ARTDroid can be used on any real devices with ART runtime once getting the root privilege. The applications of ARTDroid include dynamic analysis of Android malware on real devices or security policies enforcement.
+In this work, we present ARTDroid, a framework for hooking virtual-methods under ART runtime. ARTDroid supports the virtual-method hooking without any modifications to both Android system and app's code. ARTDroid allows to analyze apps even if they employ anti-tampering techniques or they use either Java reflection or JNI to invoke virtual-methods. Moreover, ARTDroid can be used on any real devices with ART runtime once getting the root privilege. The applications of ARTDroid include dynamic analysis of Android malware on real devices or security policies enforcement.
 
 
 
