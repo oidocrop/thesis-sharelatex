@@ -10,7 +10,7 @@ Android is a modern operating system with a layered software stack. The followin
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=.5\textwidth, keepaspectratio, resolution=600, angle=270]{android-stack.pdf}
+\includegraphics[width=.5\textwidth, keepaspectratio, resolution=600]{android-stack.pdf}
 \caption{Android System Architecture}
 \label{fig:androidsys}
 \end{figure}
@@ -51,8 +51,6 @@ Binder acts as a mediation point for all IPC. Access to system resources (e.g., 
 \label{fig:androidmodel}
 \end{figure}
 
-
-
 When a process sends a message to another process, the kernel allocates some space in the destination process’s memory, and copies the message data directly from the sending process. It then queues a short message to the receiving process telling it where the received message is. The recipient can then access that message directly (because it is in its own memory space). When a process is  finished with the message, it notifies the Binder driver to mark the memory as free.
 
 Higher-level IPC abstractions in Android such as Intents (commands with associated data that are delivered to components across processes), Messengers (objects that enable message-based communication across processes), and ContentProviders (components that expose a cross-process data management interface) are built on top of Binder. Additionally, service interfaces that need to be exposed to other processes can be de ned using the Android Interface De nition Language (AIDL), which enables clients to call remote services as if they were local Java objects. The associated aidl tool automatically generates stubs (client-side representations of the remote object) and proxies that map interface methods to the lower-level transact() Binder method and take care of converting parameters to a format that Binder can transmit (this is called parameter marshalling/unmarshalling). Because Binder is inherently typeless, AIDL-generated stubs and proxies also provide type safety by including the target interface name in each Binder transaction (in the proxy) and validating it in the stub.
@@ -87,8 +85,6 @@ Moreover, since Android version 4.3, SELinux was adopted with its Mandatory Acce
 \caption{Android Security model}
 \label{fig:androidmodel}
 \end{figure}
-
-
 
 %\textbf{Apps certificate.}  
 Android requires  all APKs to be digitally signed with a certificate. A public-key certificate contains the public key of a public/private key pair, as well as some other metadata identifying the owner of the key. The owner of the certificate holds the corresponding private key. When a developer signs an APK, the signing tool attaches the public-key certificate to the produced APK. The public-key certificate serves as a fingerprint that uniquely associates the APK to its developer and his corresponding private key. This helps Android to ensure that any future updates to that APK  come from the original developer. In fact, developers must use the same certificate throughout the lifespan of their apps to push new versions of their apps to the users' devices. In Android, a certificate authority is not mandatory: typically the app certificates do not need to be signed by a certificate authority and most developers use self-signed certificates.

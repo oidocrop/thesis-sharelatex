@@ -35,14 +35,14 @@ Our approach extends backward slicing across multiple app components. We build a
 \iffalse
 \begin{figure}[ht!]
 \centering
-\lstinputlisting[language=Java,label={lst:test1}]{listings/slice.java}
+\lstinputlisting[language=Java,label={lst:test1}]{mysnippets/slice.java}
 \label{fig:slices}
 \caption{Extracted and Refined Slice}
 \label{fig:slices}
 \end{figure}
 \fi
 
-\lstinputlisting[language=Java,label={lst:slices}, caption={Extracted and Refined Slice}]{listings/slice.java}
+\lstinputlisting[language=Java,label={lst:slices}, caption={Extracted and Refined Slice}]{mysnippets/slice.java}
 
 %Listing \ref{fig:outact} and \ref{fig:inact} show code snippets taken from DroidBench \cite{droidbenchpage} suite. It is an open test suite for evaluating the effectiveness of taint-analysis tools. It is, basically, a collection of several  apps which leak sensitive data exploiting different Android features (like Android activity lifecycle, callback, thread, ICC, etc\ldots). Even if it is mainly intended for a different purpose (the evaluation of taint-analysis tools), in the following we used an example app from Droidbench (the ones which uses ICC for malicious behavior) to describe and demonstrate the effectiveness of our approach. We used the Dexguard \cite{dexguardpage} tool to obfuscate the interesting apps using different techniques like Java reflection and string encryption. Then, instead of looking for a flow between source and sink methods, our goal is to automatically extract the malicious behavior, which involves ICC mechanism, from the obfuscated app.
 

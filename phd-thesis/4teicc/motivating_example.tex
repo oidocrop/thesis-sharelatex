@@ -17,24 +17,24 @@ The rising use of techniques such as obfuscation and ICC for information leakage
 \iffalse
 \begin{figure}[ht!]
 \centering
-\lstinputlisting[language=Java,label={lst:test1}]{listings/malware1.java}
+\lstinputlisting[language=Java,label={lst:test1}]{mysnippets/malware1.java}
 \caption{MessageReceiver}
 \label{fig:mlw1}
 \end{figure}
 \fi
 
-\lstinputlisting[language=Java,label={lst:m1w1}, caption={MessageReceiver}]{listings/malware1.java}
+\lstinputlisting[language=Java,label={lst:m1w1}, caption={MessageReceiver}]{mysnippets/malware1.java}
 
 \iffalse
 \begin{figure}[ht!]
 \centering
-\lstinputlisting[language=Java,label={lst:test1}]{listings/malware2.java}
+\lstinputlisting[language=Java,label={lst:test1}]{mysnippets/malware2.java}
 \caption{SendService}
 \label{fig:mlw2}
 \end{figure}
 \fi
 
-\lstinputlisting[language=Java,label={lst:m1w2}, caption={SendService}]{listings/malware2.java}
+\lstinputlisting[language=Java,label={lst:m1w2}, caption={SendService}]{mysnippets/malware2.java}
 
 To ease the understanding of our contributions, we are going to introduce a code snippet of a real-malware sample reported by FireEye in \cite{firemalware}. Listing \ref{lst:m1w1} shows the de-obfuscated version of the code used to intercept and then report the incoming SMS. The forwarding process is defined in a service component. The \emph{MessageReceiver} (line 2) is called for each incoming SMS and then an Android service is started by an Intent (line 12). The number and text data are stored within the Intent (lines 10, 11). Note that the original obfuscated malware uses string encryption on the constant string along with Java reflection for calling ICC methods. Then the started service, shown in Listing \ref{lst:m1w2}, gets data from the incoming Intent (lines 5, 6) and leaks (line 14) SMS number and text via a remote server connection (the server IP address string was obfuscated as well).
 
@@ -52,19 +52,19 @@ To the best of our understanding, static analyzers \cite{octeau2013effective,oct
 % \centering
 % \subfigure[Multiple Method Slice]{
 % \centering
-% \lstinputlisting[language=Java,label={lst:test1}]{listings/ActComm7.java}
+% \lstinputlisting[language=Java,label={lst:test1}]{mysnippets/ActComm7.java}
 % \label{fig:outact}
 % }
 % ~%Nothing
 % \subfigure[Inline Slices]{
 % \centering
-% \lstinputlisting[language=Java,label={lst:test1}]{listings/ActComm7_2.java}
+% \lstinputlisting[language=Java,label={lst:test1}]{mysnippets/ActComm7_2.java}
 % \label{fig:inact}
 % }
 % %~%Nothing
 % %\subfigure[Inline Slices]{
 % %\centering
-% %\lstinputlisting[language=Java,label=%{lst:test1}]{listings/ActComm7_3.java}
+% %\lstinputlisting[language=Java,label=%{lst:test1}]{mysnippets/ActComm7_3.java}
 % %\label{fig:slices}
 % %}
 % \caption{Slice Categories; \textit{E}: Entrypoint Method, \textit{T}: Target Method, \textit{IM}: Intermediate Method, \textit{NR}: Non-relevant Method}

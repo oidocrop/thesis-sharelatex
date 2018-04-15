@@ -1,10 +1,5 @@
 \chapter{ARTDroid: Hooking on Android ART Runtime}
 
-The analysis of Android apps becomes more and more difficult currently. Both benign and malicious developers use various protection techniques, such as Java reflection, dynamic code loading and code obfuscation \cite{rastogi2013droidchameleon}, to prevent their apps from reverse-engineering. Java reflection and dynamic code loading techniques can dynamically launch specific behaviors, which can be only monitored in dynamic analysis environment instead of static analysis. Besides, in obfuscated apps, static analysis can only check the API-level behaviors of apps rather than the fine-grained behaviors, such as the URL in network connections and the phone number of sending SMS behavior.
-
-Without above limitations of static analysis, the dynamic analysis approach is usually used for deeply analyzing apps \cite{spreitzenbarth2013mobile}. Currently, dynamic analysis uses hooking techniques for monitoring behaviors of apps. The hooking techniques can be divided into two main types: 1) hooking Android framework APIs by modifying Android system \cite{zhauniarovich2015stadyna}\cite{enck2014taintdroid}, and 2) hooking APIs used in the app process by static instrumentation \cite{backes2013appguard}\cite{davis2013retroskeleton}. Both of them have limitations to analyze trick samples. The first hooking technique has a drawback that it cannot be used on other vendors' devices except for Google Nexus devices or emulators. This gives a chance for malicious apps, which uses the device fingerprint and anti-emulator technique to evade the dynamic detection. Even though the second hooking technique does not have this drawback, but it becomes useless when apps apply anti-repacking techniques. Apps can check the integrity of themselves in runtime and enter the frozen mode to prevent dynamic analysis if the integrity is broken. Moreover, if malicious apps implement malicious behaviors in native codes, the second hooking technique still cannot detect them.
-
-
 To build a better hooking framework for dynamic analysis, we design \textbf{ARTDroid}, an framework for hooking virtual-method calls under the latest Android runtime (ART). The idea of hooking on ART is tampering the virtual method table (vtable) for detouring virtual-methods calls. The vtable is to support the dynamic-dispatch mechanism. And, dynamic dispatch, i.e., the runtime selection of a target procedure given a method reference and the receiver type, is a central feature of object-oriented languages to provide polymorphism. Since almost all Android sensitive APIs are virtual methods, we can collect the apps behavior by using ARTDroid to hook Android APIs methods.
 
 
@@ -37,20 +32,22 @@ At the installation time, ART compiles apps using the on-device \textbf{dex2oat}
 
 Even Android framework JARs are compiled by the {\tt dex2oat} tool to the {\tt boot.oat} file. To allow pre-loading of Java classes used in runtime, an image file called {\tt boot.art} is created by dex2oat. The image file contains pre-initialized classes and objects from the Android framework JARs. Through linking to this image, OAT files can call methods in Android framework or access pre-initialized objects. We are going to briefly analyze the ART internals, using as codebase the Android version 6.0.1\_r10.
 
-%\begin{figure}[h!]
-%\lstinputlisting[language=C++]{listings/class.h}
-%\caption{ART Class type}
-%\label{lst:artclass}
-%\end{figure}
+
+
+\begin{figure}[h!]
+\lstinputlisting[language=C++]{mysnippets/class.h}
+\caption{ART Class type}
+\label{lst:artclass}
+\end{figure}
 
 The ART runtime uses specific C++ classes to mirror Java classes and methods. Java classes are internally mirrored by using \textbf{Class}\footnote{art/runtime/mirror/class.h}. In Figure \ref{lst:artclass}, virtual-methods defined in \textit{Class} are stored in an array of {\tt ArtMethod*} elements, called {\tt virtual\_methods\_} (line 11). The {\tt vtable\_} field (line 8) is the \textbf{virtual method table}. During the linking, the vtable from the superclass is copied, and the virtual methods from that class either override or are appended inside it. Basically, the vtable is an array of {\tt ArtMethod*} type. Direct methods are stored in the {\tt direct\_methods\_ } array (line 10) and the  {\tt iftable\_} array (line 5) contains pointers to the interface methods. We leave interface-methods hooking for future work. The Figure \ref{art:artmethod} shows the definition of \textbf{ArtMethod} class\footnote{art/runtime/art\_method.h}. The main functionality of {\tt ArtMethod} class is to represent a Java method.
 
 
-%\begin{figure}[h!]
-%\lstinputlisting[language=C++]{listings/art-method.h}
-%\caption{ART ArtMethod type}
-%\label{art:artmethod}
-%\end{figure}
+\begin{figure}[h!]
+\lstinputlisting[language=C++]{mysnippets/art-method.h}
+\caption{ART ArtMethod type}
+\label{art:artmethod}
+\end{figure}
 
 By definition, a method is declared within a class, pointed by the {\tt declaring\_class\_ } field (line 3). The method's index value is stored in the {\tt method\_index\_ } field (line 5). This value is the method's index in the concrete method dispatch table stored within method's class. The {\tt access\_flags\_ } field (line 4) stores the method's modifiers (i.e., public, private, static, protected, etc\ldots) and the {\tt PtrSizedFields} struct, (line 7), contains pointers to the ArtMethod's entry points. Pointers stored within this struct are assigned by the ART compiler driver at the compilation time. 
 
@@ -60,17 +57,17 @@ By definition, a method is declared within a class, pointed by the {\tt declarin
 In this paragraph we describe how ART runtime invokes virtual-methods by choosing the virtual-method {\tt android.telephony.TelephonyManager}'s {\tt getDeviceId} as an example. Figure \ref{fig:es1} shows that the getDeviceId method is invoked on TelephonyManager object's class (line 4). Figure \ref{fig:oatdump} shows dumped compiled codes for arm architecture by \textit{oatdump} tool. 
 
 
-%\begin{figure}[h!]
-%\lstinputlisting[language=Java]{listings/testcode.java}
-%\caption{Call to method getDeviceId} 
-%\label{fig:es1}
-%\end{figure}
+\begin{figure}[h!]
+\lstinputlisting[language=Java]{mysnippets/testcode.java}
+\caption{Call to method getDeviceId} 
+\label{fig:es1}
+\end{figure}
 
-%\begin{figure}[h!]
-%\lstinputlisting{listings/compiledcode.txt}
-%\caption{Compiled native code of callGetDeviceId}
-%\label{fig:oatdump}
-%\end{figure}
+\begin{figure}[h!]
+\lstinputlisting{mysnippets/compiledcode.txt}
+\caption{Compiled native code of callGetDeviceId}
+\label{fig:oatdump}
+\end{figure}
 
 
 Before discussions on native code, in Fig. \ref{fig:oatdump}, we briefly introduce the devirtualization. To speedup runtime execution, during the on-device compilation time, virtual-methods calls are devirtualized. Devirtualization process uses method's index to point to the relative element inside the vtable within {\tt receiver} instance's class.  As result, compiled code contains static memory offset used to get the called ArtMethod's memory reference. 
@@ -205,26 +202,26 @@ overhead & 0.24 s    &   0.25 s  &   0.25 s \\
 
 Now, we show a case study by hooking \textit{TelephonyManager}'s \textit{getDeviceId} in ARTDroid.
 
-%\begin{figure}[ht]
-%\begin{center}
-%\lstinputlisting[language=xml]{listings/config.json}
-%\caption{ARTDroid configuration file}
-%\label{artconf}
-%\end{center}
-%\end{figure}
+\begin{figure}[ht]
+\begin{center}
+\lstinputlisting[language=xml]{mysnippets/config.json}
+\caption{ARTDroid configuration file}
+\label{artconf}
+\end{center}
+\end{figure}
 
 Figure \ref{artconf} shows the configuration file which contains the definition of methods to hook. 
 This file is used to define the information requested by ARTDroid, which are: method's name and signature and the class' name where the patch code is defined in. 
 The patch code called instead of method \textit{getDeviceId} is showed inFigure \ref{artpatch}.
 
 
-%\begin{figure}[ht]
-%\begin{center}
-%\lstinputlisting[language=Java]{listings/patch-code.java}
-%\caption{Patch code for method getDeviceId}
-%\label{artpatch}
-%\end{center}
-%\end{figure}
+\begin{figure}[ht]
+\begin{center}
+\lstinputlisting[language=Java]{mysnippets/patch-code.java}
+\caption{Patch code for method getDeviceId}
+\label{artpatch}
+\end{center}
+\end{figure}
 
 To restore the original call-flow, ARTDroid exposes to Java patch-code the native function {\tt callOriginalMethod}. This function receivers as first argument the string key to identify the target method in the dictionary of hooked methods, internally managed by ARTDroid. Second argument represents the \textit{this} object and the last argument is the array of method's arguments. All future calls to method getDeviceId will be redirected to the patch code, independently if these calls are made using Java reflection mechanisms or JNI.
 
