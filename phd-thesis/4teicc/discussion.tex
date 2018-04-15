@@ -1,0 +1,254 @@
+\section{Evaluation and Discussion}
+\label{sec:discussion}
+This section presents experimental results that characterize the effectiveness of TeICC to analyze apps that conceal sensitive information flow using obfuscated ICC.
+We evaluate TeICC on two benchmark test suites, DroidBench~\cite{droidbenchpage} and ICC-Bench~\cite{wei2014amandroid}, specifically crafted for testing tools to detect information flow concealed using ICC. ICC-Bench includes 9 test case apps
+and DroidBench contains 23 apps included in the \emph{InterComponentCommunication} test case. The goal of evaluation of TeICC is to test its capability to extract slices across multiple components in obfuscated apps and execute them. Therefore, we obfuscated these ICC-based test suites using DexGuard\cite{dexguardpage} to evaluate TeICC.
+
+%We use ICC-Bench and DroidBench test suites for comparison purpose  because they consist of apps designed to specifically test ICC mechanism and we use them as \emph{ground truth} because for those apps all ICC flows are known in advance.
+
+%We want to note that TOOLNAME is not intended for finding suspicious leakage across different Android components.
+
+%Although,
+%our backward-slicing approach is generic and can be used for any data-flow analysis, we focus in this paper on: extraction of slices across different components from an obfuscated app and then execute them on a real world device. 
+
+% Additionally,  we evaluate TOOLNAME on two different sets, the former composed by 100 apps crawled from the GooglePlay\cite{GooglePlay_webpage} store by retrieving the top 100 free apps. The latter contains 100 randomly selected malware from the IccTA dataset\cite{iccre}, it includes malware apps which use ICC flows to exchange sensitive data.
+
+Table \ref{tab:droidbench} shows evaluation results for both DroidBench and ICC-Bench test suites. For brevity we group the apps in categories. The second column contains the number of ICC links found by TeICC while the third and fourth column show if the apps have been correctly analyzed by IccTA\cite{li2015iccta} and TeICC, respectively. The symbol \ding{56} means that the tool has failed to analyze the app and the symbol \ding{52} means that the app has been properly analyzed. Not surprisingly, TeICC outperforms IccTA on both tests since IccTA cannot detect ICC methods called by Java reflection and encrypted strings used in intents. As shown in Table~\ref{tab:droidbench}, TeICC can automatically extract-then-execute 100\% of ICC flows in all apps; except for those which perform ICC involving a \emph{Content Provider} because currently TeICC does not provide support for Content Providers. Unfortunately, we cannot evaluate Harvester\cite{rasthofer2016harvesting} because it is not open source. However, we understand that it will not be successful as well because it does not support slicing across different Android components.
+
+
+\renewcommand{\arraystretch}{1.2}
+
+
+\iffalse
+\begin{table*}[!htbp]
+\centering
+\begin{tabular}{@{}cccccccc@{}} \toprule
+\multicolumn{8}{c}{Destination Component} \\ \cmidrule(l){2-8}
+& & Activity & Service & Provider & Receiver & Sum & Triggered \\ \midrule
+\multirow{3}{*}{Source Comp.} & Activity & 41115 & 7696 & 0 & 31147 & asd & asd \\ 
+& Service & 45890 & 9080 & 0 & 36233 & asd & asd \\ 
+%& Provider & 0 & 0 & 0 & 0 & asd & asd \\
+& Receiver & 2021 & 390 & 0 & 1605 & asd & asd \\ 
+\bottomrule
+\end{tabular}
+\caption{Malware apps}
+\label{tab:mlw}
+\end{table*}
+\fi
+\iffalse
+\begin{table*}[!htbp]
+\centering
+\begin{tabular}{@{}cccccccc@{}} \toprule
+\multicolumn{8}{c}{Destination Component} \\ \cmidrule(l){2-8}
+& & Activity & Service & Provider & Receiver & Sum & Triggered \\ \midrule
+\multirow{3}{*}{Source Comp.} & Activity & 36239 & 4114 & 0 & 55926 & asd & asd \\ 
+& Service & 0 & 184 & 0 & 0 & asd & asd \\ 
+%& Provider & 0 & 0 & 0 & 0 & asd & asd \\
+& Receiver & 4057 & 454 & 0 & 6275 & asd & asd \\ 
+\bottomrule
+\end{tabular}
+\caption{GooglePlay store apps}
+\label{tab:normal}
+\end{table*}
+\fi
+\iffalse
+\begin{table*}[!htbp]
+\centering
+\begin{tabular}{@{}cccccccc@{}} \toprule
+\multicolumn{8}{c}{Destination Component} \\ \cmidrule(l){2-8}
+& & Activity & Service & Provider & Receiver & Sum & Triggered \\ \midrule
+\multirow{3}{*}{Source Comp.} & Activity & 240 & 0 & 0 & 7 & asd & asd \\ 
+& Service & 0 & 1 & 0 & 0 & asd & asd \\ 
+%& Provider & 0 & 0 & 0 & 0 & asd & asd \\
+& Receiver & 34 & 0 & 0 & 1 & asd & asd \\ 
+\bottomrule
+\end{tabular}
+\caption{DroidBench apps}
+\label{tab:droidbench}
+\end{table*}
+\fi
+
+\begin{table}[!htbp]
+\centering
+\begin{tabular}{@{}cccc@{}} \toprule
+Apps & ICC & IccTa & TeICC \\ \midrule
+%\cmidrule(l){1-4}
+\multicolumn{4}{c}{DroidBench} \\ \cmidrule(l){1-4}
+startActivity[1-7] & 2/9 & \ding{56} & \ding{52}  \\
+startActivityForResult[1-4] & 0/8 & \ding{56} & \ding{52}  \\
+sendBroadCast1 & 0/1 & \ding{56} & \ding{52} \\
+sendStickyBroadCast1 & 0/1 & \ding{56} & \ding{52}  \\
+startService[1-2] & 0/2 & \ding{56} & \ding{52} \\
+bindService[1-4] & 0/4 & \ding{56} & \ding{52} \\
+ContentProvider[1-4] & 4/0 & \ding{56} & \ding{56} \\
+%query1 & 1/0 & \ding{56} & \ding{56} \\
+%delete1 & 1/0 & \ding{56} & \ding{56}  \\
+%insert1 & 1/0 & \ding{56} & \ding{56}  \\
+%update1 & 1/0 & \ding{56} & \ding{56}  \\
+\cmidrule(l){1-4}
+\multicolumn{4}{c}{ICC-Bench} \\ \cmidrule(l){1-4}
+Explicit1 & 0/1 & \ding{56} & \ding{52} \\
+Implicit[1-6] & 7/0 & \ding{56} & \ding{52} \\
+DynRegister[1-2] & 2/0 & \ding{56} & \ding{52} \\
+\bottomrule
+\end{tabular}
+\caption{DroidBench/ICC-Bench apps.  ICC: \# of implicit/explicit transitions between components.}
+\label{tab:droidbench}
+\end{table}
+ 
+ 
+%\begin{itemize}
+Our results indicate that TeICC permits to effectively extract-then-execute the target slices obtained from the program slicing analysis. If, for instance, the target app contains checks which could prevent the dynamic analysis (\textit{i.e.,} emulation detection, integrity checks, etc.), they are not extracted in the slicing step (unless they hold a data dependence with the MOI). 
+%\item 
+%TOOLNAME has different features over the current state of the art of both dynamic and static analyzer. 
+In contrast to Harvester \cite{rasthofer2016harvesting}, TeICC supports the ICC mechanism which enables it to automatically extract-and-execute target slices that belong to  different Android components. Similarly, R-Droid \cite{backes2016r} lacks support for both ICC and Java reflection mechanisms.  
+Compared to IccTa\cite{li2015iccta},
+TeICC, based on a hybrid approach, permits to enrich the original app after its targeted execution to resolve obfuscated parts of the app. Over different executions it permits to extract runtime values from reflection calls or dynamically loaded code and integrate them in the analysis for the next iteration. 
+%\end{itemize}
+
+At the moment TeICC does not support the \emph{Content Provider} component; we leave it as future work. Moreover, it does not analyze native code. For instance, if an SMS message is sent from native code, TeICC cannot use this hidden call to \emph{sentTextMessage()} as MOI. However, just like TeICC, both \cite{rasthofer2016harvesting} and \cite{backes2016r} also do not support native code analysis.
+
+
+
+% \begin{tikzpicture}
+% \begin{axis}[
+%     ybar stacked,
+%     enlargelimits=0.15,
+%     legend style={at={(0.5,-0.20)},
+%       anchor=north,legend columns=-1},
+%     ylabel={\#participants},
+%     symbolic x coords={tool1, tool2, tool3, tool4, 
+% 		tool5, tool6, tool7},
+%     xtick=data,
+%     x tick label style={rotate=45,anchor=east},
+%     ]
+% \addplot+[ybar] plot coordinates {(tool1,0) (tool2,2) 
+%   (tool3,2) (tool4,3) (tool5,0) (tool6,2) (tool7,0)};
+% \addplot+[ybar] plot coordinates {(tool1,0) (tool2,0) 
+%   (tool3,0) (tool4,3) (tool5,1) (tool6,1) (tool7,0)};
+% \addplot+[ybar] plot coordinates {(tool1,6) (tool2,6)
+%   (tool3,8) (tool4,2) (tool5,6) (tool6,5) (tool7,6)};
+% \addplot+[ybar] plot coordinates {(tool1,4) (tool2,2) 
+%   (tool3,0) (tool4,2) (tool5,3) (tool6,2) (tool7,4)};
+% \legend{never, rarely, sometimes, often}
+% \end{axis}
+% \end{tikzpicture}
+
+% \begin{table}
+% \centering
+% \caption{ICC-dataset}
+% \begin{tabular}{|c|c|c|} \hline
+% Type&Type&Results\\ \hline
+% \multirow{4}{*}{Components} & Activity  & 1229 \\ 
+% & Service  & 72 \\ 
+% & Receiver & 6 \\ 
+% & Provider & 152 \\  
+% \hline
+% \multirow{6}{*}{Intents} & Implicit & asd \\
+% & Explicit & asd \\ 
+% & Activity & 1412 \\
+% & Service & 90 \\
+% & Receiver & 0 \\
+% & Provider & 34 \\ 
+% \hline
+% \multirow{4}{*}{ExitPoints} & Activity & 1453 \\
+% & Service  & 111 \\ 
+% & Receiver & 152 \\ 
+% & Provider & 36 \\ 
+% \hline
+% \end{tabular}
+% \label{tab:sandbox}
+% \end{table}
+
+%---------------------------------------------
+%DroidBench Analysis
+\iffalse
+1. ActivityCommunication1
+ - Activities : 2
+ - No direct link between the activities (taskAffinity - have to check)
+ - DataFlow : Activity2.onCreate: source -> Activity1.data1; Activity1.onCreate: data1 -> sink
+ 
+2. ActivityCommunication2
+ - Activities : 3
+ - One link from OutFlowActivity -> InflowActivity. StartActivity using Intent declared in the manifest manipulated using substring(). 
+ - DataFlow: OutFlowActivity gets data and starts InflowActivity which leaks it.
+
+3. ActivityCommunication3
+ - Activities : 3
+ - 1 link : Activity resolution activity.getClassName()
+ - DataFlow : OutFlowActivity gets data and starts InflowActivity which leaks it.
+ 
+4. ActivityCommunication4
+ - Activities : 3
+ - One link from OutFlowActivity -> InflowActivity. StartActivity using Intent declared in the manifest manipulated using string concatenation. 
+ - DataFlow: OutFlowActivity gets data and starts InflowActivity which leaks it.
+ 
+5. ActivityCommunication5
+ - Activities : 3
+ - One link from OutFlowActivity -> InflowActivity. StartActivity using ComponentName object by providing the name of InFlowActivity. 
+ - DataFlow: OutFlowActivity gets data and starts InflowActivity which leaks it.
+ 
+6. ActivityCommunication6
+ - Activities : 3
+ - One link from OutFlowActivity -> InflowActivity. StartActivity using using Intent passed through a List object of intents. 
+ - DataFlow: OutFlowActivity gets data and starts InflowActivity which leaks it.
+ 
+7. ActivityCommunication7
+ - Activites : 3
+ - One link from OutFlowActivity -> InflowActivity. StartActivity using using Intent with non-constant Activity.getClass(). 
+ - DataFlow: OutFlowActivity gets data and starts InflowActivity which leaks it.
+ 
+8. ActivityCommunication8
+ - Activities : 3
+ - One link from OutFlowActivity -> InflowActivity. StartActivity using using Intent where the action string is passed to the Intent through a List object of Strings. 
+ - DataFlow: OutFlowActivity gets data and starts InflowActivity which leaks it.
+ 
+9. BroadCastTaintAndLeak1
+ - Activities : 1
+ - Receivers : 1 (Declared and registered inside the Activity)
+ - OnCreate registers a receiver which leaks data which is provided by onDestroy of the Activity.
+ 
+10. ComponentNotInManifest1
+ - Activities : 2 (2 more which are not declared in the manifest)
+ - Links : No link, apparently OutFlowActivity gets IMEI, calls startActivity for InFlowActivity, but since InFlowActivity is not declared in the manifest, it won't start. InFlowActivity does contain the code for leaking IMEI.
+ 
+11. EventOrdering1
+ - Activities : 3
+ - Links : OutFlowActivity activity start InFlowActivity. 
+ - DataFlow : InFlowAcitivty has a method which reads IMEI and writes it to sharedPref. If this activity is called by some foreign app before its being called by OutFlowActivity, it will read IMEI and write it sharedPref. Then, when OutFlowActivity calls it, it leaks the IMEI. Otherwise NOT. In our case, we will extract the slice, execute it, but it won't leak IMEI.
+ 
+12. IntentSink1
+ - Activities : 1
+ - Activity gets IMEI and writes it to an Intent which is added to the .setResult() of the activity. The Intent will be received by the calling activity and so as the IMEI. 
+ 
+13. IntentSink2
+ - Activities : 1
+ - Activity reads IMEI, reads an appName provided by the user via an EditText field and starts the appName with an Intent containing the IMEI.
+ 
+14. IntentSource1
+ - Activities : 1
+ - DataFlow : From onCreate to onActivityResult of the same activity. In the onCreate, the activity starts the same activity by calling startActivtyForResult. 
+ 
+15. ServiceCommunication1
+ - Activities : 1
+ - Services : 1
+ - ICC Link : Activity -> Service
+ - DataFlow : Activity reads IMEI after a user presses a button and sends it to the Service using Binder messaging service.
+ 
+16. SharedPreferences1
+ - Activities : 2
+ - MainActivity reads IMEI, writes it to sharedPref. OtherActivity reads sharedPref and leaks it. 
+ - Links : No direct link between the activities (like start activity or something)
+ 
+17. Singleton1
+ - Activities : 2
+ - MainActivity onCreate write "" to a string in a Static Class Singleton's field s. It onStop leaks it. OtheActivity writes IMEI to the same field. It otherActivity gets executed before MainActivity, leakage will take place. Otherwise NOT.
+ 
+18. UnresolvableIntent1
+ - Activities : 3
+ - Links : 2, OutFlowActivity calls either InFlowActivity1 or InFlowActivity2 based on a random number generator. 
+ - DataFlow : OutFlowActivity -> InFlowActivity and OutFlowActivity -> InFlowActivity2
+\fi
+%----------------------------------------------
+
+

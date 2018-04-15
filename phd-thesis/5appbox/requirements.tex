@@ -1,0 +1,29 @@
+\section{Requirements}
+In this section, we present the set of requirements that have driven the design of \asd. 
+
+Our aim is to provide a lightweight app-level sandboxing solution for stock Android that does not require modifications of the apps' code. The following requirements are needed and are met by \asd:
+\begin{itemize}
+\item \textbf{R1:} No OS modifications and no root privileges. The mechanism must not require  modifications/extensions to the Android OS. Moreover, the mechanism must be able to operate without root privileges. 
+
+\item \textbf{R2:} Permissions: The mechanism should not require more privileges and permissions than those originally requested by the app that will be sandboxed. 
+
+\item \textbf{R3:} Universal: The mechanism can be applied to monitor and enforce policy on any app running on current and/or any previous version of Android, without requiring any app code modification or integration with SDKs.
+
+\item \textbf{R4:} Java and native: The mechanism must support the monitoring and enforcement of policies, covering the app behaviour that can be captured at both Java and at native level.
+
+\item \textbf{R5:} Lightweight: lower overhead when compared to existing solutions providing similar security features.
+\end{itemize}
+
+The first requirement, $R1$ is quite important especially when it comes to enterprise environments. Enterprises are not keen to deploy approaches that require root permissions or extensive modifications to the OS core components. In the former case, enabling root permissions might void the device's manufacturer guarantees and open the door to  critical attacks (e.g., escalating privileges attacks).
+In the latter, modifications of the OS, especially to key components (i.e., system services, permission system) could introduce unexpected vulnerabilities in the OS code base and undermine any security guarantee. 
+
+Requirement $R2$, specifies that our solution does not alter the permissions set of the original app. This is important to avoid users rejecting existing applications on the basis of additional permissions they don't agree to grant.  Furthermore, the least-privilege paradigm has a key role in Android, in fact it is a fundamental access control mechanism that the Android OS relies upon.
+
+Requirement $R3$ is the one that makes  \asd  different from  existing  MDM/MAM solutions.
+\asd is universal in the sense that it can be used to monitor and enforce security policies for any existing app without integration with special shared library or use of SDKs. In fact, \asd does not require  access to the app's code because it automatically wraps the app's components. All information \asd needs to wrap the managed app are extracted from the app's Manifest file, that is always presented in clear form. Moreover, \asd does not require any modification to the managed app's bytecode, a crucial difference with respect to the repackaging approaches that have been proposed so far.
+
+Furthermore, the managed app's updates can be distributed by the developer to the enterprise via the usual flow, through the market used for the initial distribution (e.g., Google Play, Android for Work, Amazon market). From the user's point of view, the managed app's updates look exactly as usual app updates. In fact, no additional user interaction is requested in order to complete an app's update. Finally, the managed app can be an app developed for any version of Android, thus fully supporting  backward compatibility.
+
+In order to achieve fine-grained app-level security policies ($R4$), \asd is able to monitor and act on  the behavior of the managed app at both Java and native layers. By monitoring both levels of interaction, \asd is able to manipulate high-level interactions made through the Android middleware (e.g., modifying the running app's context, steering android callbacks to user-defined code) as well as low-level behavior (e.g., create a socket). 
+
+Any sandboxing mechanism to be accepted for real deployment must not have significant impact in terms of performance. It must be lightweight, hence requirement $R5$.  

@@ -1,0 +1,22 @@
+\chapter{Targeted Execution using Effective APK Instrumentation for Dynamic Analysis of Android Apps}
+\label{sec:teicc}
+
+Mobile apps are analyzed for malicious contents before being published to app stores, such as Google Play Store. The analysis usually involves two categories, \textit{i.e.,} static (reasoning about an app without executing it) and dynamic (executing apps in a controlled environment and understanding their behavior). Both of these analysis techniques have their pros and cons. While the former provides an over-approximation of what a piece of code actually performs, the latter misses certain execution paths due to limited duration of the analysis and the triggering problem. Static analysis also suffers from code obfuscation problems and dynamic code updates. Dynamic analysis, on the other hand, provides a solution to these problems, but requires test cases which could execute a major/required portion of the code.
+Execution of certain code paths in mobile apps depends upon a combination of various user/system events. Generally, it is hard to predict inputs which can stimulate the required behavior in these apps. This feature of mobile apps is widely used by malware developers to conceal malicious functionality. 
+
+Code coverage is a well-known limitation of dynamic analysis approaches. However, for the purpose of security analysis rather than testing, it is required to stimulate/reach only specific points of interest (POI) in the code rather than stimulating all the code paths in an app. In literature, researchers have focused mainly on providing inputs to make an app follow a specific path. Providing the exact inputs and environment becomes very hard as different apps may require different execution environments. Moreover, not all inputs can be predicted statically, because of obfuscation or other hiding techniques.
+
+In this work, we propose a fully automated hybrid system which uses a slicing based approach for target triggering of a given MOI. It performs static data-flow analysis \cite{allen1976program,fosdick1976data} based on program slicing technique \cite{weiser1981program} to extract target slices which hold data-dependency with the parameters used by the given MOI. Moreover, our slicing approach permits slice extraction following the ICC flow across different app components. Importance of ICC in malware for sharing sensitive data is shown by Bodden \textit{et al.} in \cite{li2015iccta}. However, to the best of our knowledge, none of the existing approaches \cite{rasthofer2016harvesting, backes2016r} for targeted triggering support the extraction of interesting paths across different Android components.  
+
+In our proof of concept, TeICC, we leverage an enhanced version of SAAF to achieve program slicing \cite{hoffmann2013slicing}. We modified SAAF adding more sensitivity and support for ICC using a System Dependency Graph (SDG) (cfr. \S \ref{sec:our_approach}). Besides that, TeICC, employs a modified version of Stadyna \cite{zhauniarovich2015stadyna} which integrates ARTDroid \cite{costamagnaartdroid} to support dynamic execution of the extracted slices to resolve obfuscation and dynamic code updates. It runs on a real device/emulator with no modification to the Android framework.
+
+TeICC operates in an iterative manner where a SDG helps extraction of slices across multiple components for targeted execution and targeted execution overcomes the limitations of static analysis by resolving obfuscation and dynamic code updates. It results in construction of an improved SDG and extraction of extended slices for better analysis of apps. 
+
+\textbf{Contributions:}
+\begin{itemize}
+\item We extend the backward slicing mechanism to support ICC, \textit{i.e.,} extract slices across multiple components. Moreover, we enhance SAAF to perform data flow analysis with context-, path- and  object-sensitivity.
+
+\item Targeted execution of the extracted inter-component slices without modification to the Android framework.
+
+\item We design and implement a hybrid analysis system based on static data-flow analysis and dynamic execution on real-world device for improved analysis of obfuscated apps.
+\end{itemize}

@@ -1,0 +1,9 @@
+\section{Defense}
+\label{sec:defense}
+As we discussed in previous sections, the environment-related data represents an interesting source of information, which could be exploited to identify the mobile sandbox. Building a database of fingerprints from all sandboxes, an attacker could take the advantage to easily detect an existing mobile sandbox by checking the presence of matching data in the running environment.
+
+To avoid this trivial detection mechanism, it is important to generate environment-related data dynamically, so each application under analysis would see a different environment.
+
+Note that the presence of each previous discussed \textit{environment artifact} is also an important indicator of the goodness of the running environment. As discussed in Section \ref{sec:res}, sandboxes have not included the \text{Call artifact}. Even though such type of environment data i.e. Wi\-Fi data, could not be generated, one can artificially inject it by using hooking frameworks introduced in previous works \cite{costamagna11artdroid, Xposed,Cydia,AndroidHooker}.
+
+In addition to set up the sandbox environment as close as a real user phone, the sandbox developer could take a hybrid approach to detect such fingerprint collection behavior. For example, some sandboxes are equipped with the same set of environmental data, and other sandboxes are equipped with complete different data. When performing the dynamic analysis, each suspicious sample should be run in these two different sandboxes with similar triggering events. If two types of sandboxes yield different malicious behaviors, it indicates that the malware performs the evasion attack by checking the usage-profile based fingerprints.

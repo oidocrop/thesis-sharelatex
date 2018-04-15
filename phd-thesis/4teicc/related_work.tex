@@ -1,0 +1,35 @@
+\section{Related Work}
+\label{sec:related}
+
+%Published literature in the last few years contain a number of static analysis frameworks focusing on information-flow aspect, such as sensitive data leakage. 
+In the last few years, researchers have proposed several static analysis frameworks specifically for Android. Most of these frameworks \cite{arzt2014flowdroid,lu2012chex,gibler2012androidleaks,li2015iccta,gordon2015information} employ different type of sensitivity, \textit{e.g.,} field sensitivity, object sensitivity, etc. 
+
+%The soundness of a static analysis technique usually depends upon its support for various kinds of sensitivity, \textit{e.g.,} field sensitivity, object sensitivity, etc. Therefore, 
+% CHEX \cite{lu2012chex} and AndroidLeaks \cite{gibler2012androidleaks}, are developed on top of WALA\cite{wala2014watson} framework. The former detects component hijacking by computing data flows using while the latter detects potentially privacy leaks on a large scale analysis. 
+FlowDroid \cite{arzt2014flowdroid} detects sensitive information leakage with very high recall and precision. It supports context-, flow-, field- and object-sensitivity. However, it does not support the ICC mechanism.
+DroidSafe \cite{gordon2015information} and IccTa \cite{li2015iccta}, like FlowDroid, are developed on top of SOOT framework \cite{lam2011soot} and they are able to analyze flows between different Android components. IccTa, based on FlowDroid and IC3\cite{octeau2015composite},  detects flows of sensitive data with a greater context sensitivity. DroidSafe represents the current state-of-the-art for Android static analysis. It precisely models the Android runtime and its components leveraging \emph{Object-Sensitive Points-To} analysis.
+% which is more precise but scalability presents a challenge. \todo[inline]{scalability?i mean large scale analysis, it's what they said in the paper. no?}
+
+However, static analysis approaches have problems in analyzing obfuscated apps (\textit{i.e.,} having string encryption and using Java reflection) and to capture dynamically loaded code. These issues greatly limit the results of static analysis.
+
+Previous works have proposed a combination of static and dynamic analysis to overcome these limitations. AppAudit \cite{xia2015effective} is a program analysis framework that can dynamically analyze apps detecting data leakage using taint analysis. The most relevant works for TeICC are Harvester\cite{rasthofer2016harvesting} and R-Droid\cite{backes2016r}. They try to improve static analysis by detecting implicit intra-component data flows using program-slicing based analysis. However, neither of them supports ICC; so they are not able to automatically analyze flows between different Android components, which leaves the analysis incomplete. Moreover, R-Droid cannot properly analyze apps in the presence of Java reflection. 
+
+To the best of our knowledge, none of the existing program-slicing based hybrid approaches \cite{rasthofer2016harvesting, backes2016r} permit the analysis of ICC flows.
+%Crucially, our hybrid approach differs in some respect from previous works as discussed in \S\ref{sec:prob} and \S\ref{sec:discussion}.
+
+% As we said before, the static analyzers for Android \cite{octeau2015composite,octeau2013effective,arzt2014flowdroid},  cannot properly analyze Android apps because of different challenges (i.e., Java reflection, dynamic code loading, obfuscation, etc\ldots). On one hand, static approaches scale very well, but on the other hand these challenges are very hard to solve statically.
+
+% The academic has proposed several works focused on dynamic analysis system for Android apps XXX. Every system has its goods and bads, but all of them share a common limitation, known as code-coverage. Various research has been published XXX to increase the code-coverage based on a wide range of strategies which vary from random to systematic to highly sophisticated. However, Shauvik et al. [reference] show in their analysis of various tools that tools based on random strategies perform much better than the state-of-the-art systematic tools designed for complete program execution.
+
+% Moreover, at the best of our knowledge, the analysis of ICC flows is not supported by none of the existing hybrid approaches \cite{rasthofer2015harvesting,backes2016r} based on program slicing.
+% Crucially, our hybrid approach differs in some respect from \cite{rasthofer2015harvesting,backes2016r}
+
+
+% Some of these systematic and highly sophisticated approaches are based on generating GUI behavior (statically/dynamically), extracting information from the manifest file and symbolic execution of the app as whole or parts of the app [references for each approach]. Theoretically, systematic approaches should perform much better than random strategies. 
+% We want to focus that, as reported by Bodden et. al. in \cite{li2015iccta}, the inter component communication (ICC) mechanism is used by malware apps to exchange sensitive data. Beside  that, to achieve a reliable and precise analysis it is important to support the analysis of ICC mechanism. 
+
+
+% The various approaches used in these research publications are based on a wide range of strategies which vary from random to systematic to highly sophisticated. Some of these systematic and highly sophisticated approaches are based on generating GUI behavior (statically/dynamically), extracting information from the manifest file and symbolic execution of the app as whole or parts of the app [references for each approach]. Every approach comes with its goods and bads. Theoretically, systematic approaches should perform much better than random strategies. However, Shauvik et al. [reference] show in their analysis of various tools that tools based on random strategies perform much better than the state-of-the-art systematic tools designed for complete program execution.
+
+
+

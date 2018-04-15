@@ -1,0 +1,28 @@
+\section{Fingerprints}
+\label{sec:implementation}
+As discussed before, in this work usage-profile statistics were collected by running  Java code only, since the most sandbox are not able to analyze the native code behaviors we intentionally choose to avoid native code in our scouting application. Collecting data in Android is easy as call the specific exposed Android API. We released our scouting application as open-source project, it is published at the following address \footnote{\url{https://vaioco.github.io/avfingerprint}}.
+The scouting application requests in its AndroidManifest all possible Android permissions to maximize its capabilities within confinement of the application sandbox. \\
+In the following subsections, we present the details of collected data.
+
+\subsection{Environment artifact}
+The scouting application collects its environment data exploiting the Android API, which are basically wrappers to the underlining system services. We collected data from only a specific domain: environment-based data. \\  
+Differently from previous works \cite{petsas2014rage}\cite{vidas2014evading}\cite{jing2014morpheus} where performance , low level discrepancy, system property data are collected to detect Android emulators, we used a totally different approach. Instead of looking for discrepancy in the runtime behavior or scanning the file system looking for well known files, we do something innovative collecting and analyzing the environment data. \\
+Here we define an interesting \textit{environment artifact} as artifact whose presence can be probed or whose contents can be read by any Android application in its sandbox using only Java code.
+The main idea of this work is that environment artifact should look like user-generated data, otherwise malicious applications could use a fingerprint-based approach to detect and then evade the sandbox analysis. \\
+An \textit{environment artifact} is by definition related to the running environment, it is not related to specific system properties, like kernel objects exposed by the pseudo file systems or the Android property system. Such artifact should be created by the user who own the devices which is running the application.
+In the following we detail the type of collected data shown in Table \ref{tab:data}
+
+\begin{itemize}
+\item Contacts: Requiring the specific permission an application can easily query the \textit{ContactProvider} to get the contact list from the device. The scouting application does a query to get out all the available information from the \textit{ContactsContract.Data} table for each contact.
+\item SMS: Stored by a content provider, requiring the specific permission an application can list SMS from inbox, sent and draft container. The scouting application collects all stored SMS along with all information, specified by interface \textit{Telephony.TextBasedSmsColumns}, stored in the content provider.
+\item Calls: Information about placed, received and recents calls is stored by the \textit{android.provider.CallLog} provider. Our scouting app retrieves all calls' information as detailed by the class \textit{android.provider.CallLog.Calls}.
+\item Location: Android offers several location strategies \footnote{\url{https://developer.android.com/guide/topics/location/strategies.html}} like the GPS and Android's Network Location Provider to acquire the user location. Although GPS is most accurate, it only works outdoors. Android's Network Location Provider determines user location using cell tower and Wi-Fi signals, providing location information in a way that works indoors and outdoors. We used both strategies to get the location and sent it back to the remote server.
+\item Battery: Android provides the \textit{BatteryManager} API to retrieve the battery status\footnote{\url{https://developer.android.com/training/monitoring-device-state/battery-monitoring.html}}. Monitoring the battery information \footnote{\url{https://developer.android.com/training/monitoring-device-state/battery-monitoring.html}}  permits to determine the current charging state, the battery level and monitor when the device is connected and disconnected from power.
+\item Wi-Fi: The \textit{WifiManager} class provides the primary API for managing all aspects of Wi-Fi connectivity. It permits to collect several categories of items:
+\begin{itemize}
+\item The list of configured networks.
+\item The currently active Wi-Fi network, if any.
+\item Results of access point scans.
+\end{itemize}
+\item Applications: The class \textit{android.content.pm.PackageManager} permits to get various type of information related to the application packages that are currently installed on the device. This information is strongly related to the running environment, in fact the Android emulator contains a fixed set of installed applications. 
+\end{itemize}

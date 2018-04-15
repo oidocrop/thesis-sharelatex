@@ -1,0 +1,5 @@
+\section{Chapter Summary}
+\label{sec:conclusion}
+The SDG based backward slice extraction technique used by TeICC enables it to extract-then-execute target slices across multiple app components. Moreover, the iterative hybrid approach allows TeICC to extract runtime values (\textit{i.e.,} reflection values, decrypted strings, etc.) to enrich the original app. These runtime values help in performing improved static analysis of obfuscated apps in the next iteration. 
+
+As a future work, we would like to provide support for content providers. Moreover, we focus on different approaches to overcome current limitations. For example, to address the extraction of slices involving native calls, we are analyzing a novel approach using the ARTDroid \cite{costamagnaartdroid} framework to intercept sensitive Java methods called by native code.

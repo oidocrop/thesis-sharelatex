@@ -1,0 +1,18 @@
+CODE: (code_offset=0x002d93b5 size_offset=0x002d93b0 size=60)...
+      0x002d93b4: f5bd5c00	subs    r12, sp, #8192
+      0x002d93b8: f8dcc000	ldr.w   r12, [r12, #0]
+      suspend point dex PC: 0x0000
+      GC map objects:  v1 ([sp + #36]), v2 (r6)
+      0x002d93bc: e92d40e0	push    {r5, r6, r7, lr}
+      0x002d93c0: b084    	sub     sp, sp, #16
+      0x002d93c2: 1c07    	mov     r7, r0
+      0x002d93c4: 9000    	str     r0, [sp, #0]
+      0x002d93c6: 9109    	str     r1, [sp, #36]
+      0x002d93c8: 1c16    	mov     r6, r2
+      0x002d93ca: 1c31    	mov     r1, r6
+      0x002d93cc: 6808    	ldr     r0, [r1, #0]
+      suspend point dex PC: 0x0000
+      GC map objects:  v1 ([sp + #36]), v2 (r6)
+      0x002d93ce: f8d00234	ldr.w   r0, [r0, #564]
+      0x002d93d2: f8d0e02c	ldr.w   lr, [r0, #44]
+      0x002d93d6: 47f0    	blx     lr

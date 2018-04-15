@@ -1,0 +1,3 @@
+PolicyName: Requester can do <operation> on <Resource>
+						have to perform <action>
+            [if <condition>]

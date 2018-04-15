@@ -1,0 +1,60 @@
+\section{Related Work}
+\label{sec:related}
+
+In this section, we will review existing solutions related to our work in light of the requirements listed above. 
+
+Enforcing customised security policies in stock Android devices is quite challenging. In fact, stock Android does not offer any runtime mechanisms for a third-party app to monitor and trace actions of other apps. Due to secure isolation offered by Android's UID-based sandboxing mechanism, apps can not elevate their privilege to root to monitor other apps that are running under a different UID, e.g., like AV programs are allowed to do on a desktop OS. Consequently, most available solutions for stock Android versions are limited to userspace-available mechanisms for monitoring and enforcing security policies restricting app's behaviour. \\
+We summarized related approaches proposed in the literature in Table \ref{tab:comp} and classify them according to whether they satisfy or not our requirements. 
+
+Early works for enforcing security and privacy  policies  \cite{wang2015deepdroid,conti2010crepe,enck2014taintdroid,russello2013firedroid,heuser2014asm,bugiel2011practical} proposed to modify part of the Android OS (both at Java and native levels) or required root privilege. On the one hand they meet many of our requirements: they do not require access to the app code; the sandbox mechanism per-se does not require more permission than the app it monitors; they are able to support both Java and native monitoring levels; they have negligible overhead.
+%and they do not affect the usability as the monitored apps can properly go through an update process  R7:\ding{52}). 
+However,  they require modifications to the Android codebase making it impossible to deploy them on stock devices. 
+
+To address these limitations, researches proposed sandbox solutions based on rewriting the bytecode of the apps using inline reference monitors (IRM) to enforce security policy. Third column of Table \ref{tab:comp} shows those approaches \cite{xu2012aurasium,you2016reference,zhou2015hybrid} that have support for both Java and native monitoring layers.
+Although these systems work on stock Android, they present several limitations when it comes to rewrite obfuscated apps  as reported by previous research \cite{hao2013effectiveness}. Furthermore, once they modify the APK of the target app they break the developer copyright. On the other hand, they do not require any additional permission and they have low impact on performances.
+
+
+
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+
+
+\begin{table*}
+\caption{Comparison of Proposed Sandboxing Approaches Based on Desired Requirements. ( \ding{52} = applies; \ding{56} = does not apply )}
+\label{tab:comp}
+\centering
+\ra{1.3}
+\begin{tabular}{>{\kern-\tabcolsep}L{.17\linewidth}C{.14\linewidth}C{.15\linewidth}C{.12\linewidth}C{.09\linewidth}g<{\kern-\tabcolsep}}\toprule
+
+Requirements &  OS/root Extension \cite{bugiel2011practical, wang2015deepdroid,conti2010crepe,enck2014taintdroid,russello2013firedroid,heuser2014asm}  & Aurasium\cite{xu2012aurasium} \hspace{0.6cm} Ref. Hijacking\cite{you2016reference} Hybrid\cite{zhou2015hybrid} & Boxify\cite{backes2015boxify} & Njas\cite{bianchi2015njas} & AppBox \\
+\midrule
+(R1) No root / OS modifications &\ding{56}  & \ding{52} & \ding{52} &  \ding{52} & \ding{52} \\
+\hline
+(R2) Permissions & \ding{52}  & \ding{52} & \ding{56}   & \ding{52} &\ding{52}	\\
+\hline
+(R3) Universal & \ding{56} & \ding{56} & \ding{56} & \ding{56} & \ding{52} \\
+\hline
+(R4) Java and native & \ding{52}  & \ding{52} & \ding{52} & \ding{56} & \ding{52} \\
+\hline
+(R5) Lightweight &\ding{52} & \ding{52} & \ding{56} & \ding{56} & \ding{52} \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+More recently, two works have been published that have similar goals of our approach: 
+Boxify \cite{backes2015boxify} and NJAS \cite{bianchi2015njas}. Both of these approaches do not need to modify the Android OS and do not require root privileges. 
+
+Boxify offers app virtualization by means of isolated process, a feature introduced in Android 4.1. 
+An isolated process is a special process that executes without any privilege. This provides an isolation technique that works on stock Android devices. To manage the permissions required by the monitored apps, Boxify introduces a \textit{Broker}. The Broker to work has to collect the permissions of all the apps monitored in Boxify thus creating a component that has the cumulative privileges of all  sandboxed apps  and introducing a single point of failure. Furthermore, because an isolated process can not use the Android API, Boxify must semantically interpret through the Broker all the Binder parcels an app generates to respect the app's semantic. 
+
+To achieve full patching of all app communications, Boxify must understand the semantics of the apps. This operation generates ovehead and it would be extremely difficult for all obfuscated apps. As side-effect, the Broker introduces an additional hurdle because it needs to emulate critical Android core services (e.g., PackageManager).  
+The Broker represents a bottleneck because all the accesses to resources the apps perform have to go though it which has an impact on performance. On the other hand, Boxify offers monitoring capabilities on both Java and native layers. Finally, since the sandboxed apps are not installed in the system, the Android OS can not directly manage them. This means that when an app is updated, the distribution of the new code can not be done automatically as with normal apps but needs the extra effort from the user.
+
+NJAS provides a sandboxing solution based on the PTrace mechanism. NJAS does not require to access the app code to be able to sandbox it and works on stock Android devices. In contrast with Boxify, its monitoring mechanism does not increase the permissions set from the apps. In NJAS the target app is installed on the user device and then executed within a stub app in which it is monitored by means of PTrace. For this reason, NJAS is tightly bound to the availability of PTrace on the user device, thus limiting its deploy-ability on a wide number of real-world mobile devices. As seen in the desktop environment where several Linux distributions removed support for PTrace, this could happen also for the Android system, making impossible to deploy approach such as NJAS.
+ 
+Furthermore, considering the high number of context switches added by the PTrace-based syscall filtering which NJAS uses, it is not a lightweight solution. Finally, it enforces policies only at native level and it does not support Java. NJAS also
+requires the user interaction to update the stub component as soon as an update for the managed app is published. 
+
+Samsung Knox  provides a commercial solution. It focuses on providing capabilities including Trusted Boot, TrustZone-based Integrity Measurement Architecture (TIMA), SE for Android, and Knox containers, to protect the Android system from malware and isolate different working scenarios \cite{knox}. Despite that Knox APIs are integrated into Android 5.0 \cite{knox1}, its adoption is limited to Samsung devices \cite{knox2}. Moreover, Knox requires ARM TrustZone hardware support, which limits its deployment to only certain Android platforms.  In contrast, our \asd system is a software-based solution that can be deployed on almost all Android platforms. 
+
+At the beginning of 2015 Google launched Android for Work~\cite{AFW} (AFW), a set of Android device features and services that separate personal apps and data from a work profile containing work apps and data. Google provides APIs for third-party enterprise mobility management (EMM) providers to build Android solutions, Android for Work supports many enterprise use cases but there are two general device deployment scenarios, Bring-your-own-Device (BYOD) and Corporate-owned, single-use (COSU). Android for Work management capabilities rely upon features that are part of newer Android operating system, it is currently supported on devices running Android 5.0 Lollipop and later that support a managed profile\footnote{\url{https://developer.android.com/about/versions/android-5.0-changes.html\#managed_profiles}}. Being enrolled in AFW, a device can be monitored by the IT department that can distribute internal apps on Google Play for Work, a business-specific market offered by AFW. An app that is requested to run in a manged profile must make use of  Android For Work API\footnote{\url{https://developer.android.com/work/guide.html}}, for this reason the developer has to modify the app's codebase (R1:\ding{56}) including those APIs that are requested to communicate with the DPC component. 

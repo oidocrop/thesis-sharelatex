@@ -1,0 +1,165 @@
+\section{Results} 
+\label{sec:res}
+In this section, we describe the fingerprints collected by the scouting app. 
+Because of the difference in the Android app distribution channel, 
+we choose different types of mobile sandboxes accordingly as the target of this work, which are shown in the Table \ref{tab:sandbox}. In fact, it is composed by both official and third-party stores, i.e. Google Play, aptoide, F-Droid, etc\ldots
+and also by stock applications installed on real-world devices. First column in Table \ref{tab:sandbox} shows the type of sandbox being analyzed, second and third columns represent sandbox's name and its availability at the time of writing respectively.
+We choose to target mobile anti-virus vendors because they use either their own customized sandboxes or an online sandbox service to dynamically analyze collected samples. Moreover, we collect the environment-related data from third-party stores, because it is one of the most popular malware spreading channel. Considering that online malware analysis services are used by both mobile anti-virus and third-party stores, we also collect environment-related data from available online sandboxes. Unfortunately, compared to other previous works \cite{vidas2014evading,petsas2014rage,neuner2014enter,spreitzenbarth2013mobile}, we find that just few of these online services are available at the time of writing, as evicted by third column of Table \ref{tab:sandbox}.
+
+We use the system described in Section \ref{sec:design} to generate 10 applications for each target sandbox. Then, depending of the target type, we manually upload each generated app by using the web interface provided by the online sandbox service, or install on a real device or send it to the third-party store. In the latter case, we immediately remove the app as soon as the scouting app has been analyzed to make sure nobody has ever downloaded it. Moreover, we do not disclose the mapping between the sandbox name and its representing label to allow to sandbox maintainers to fix this problem.
+
+
+\begin{table}
+\centering
+\caption{Mobile Sandboxes employed for evaluation. (\xmark\  means not available at the time of writing)}
+\begin{tabular}{|c|c|c|} \hline
+Type&Sandbox&Available\\ \hline
+\multirow{6}{*}{Online} & Andrubis \cite{weichselbaum2014andrubis} & \xmark \\ 
+& SandDroid \cite{botnet2014sanddroid} & \cmark \\ 
+& TraceDroid\cite{van2013dynamic} & \xmark \\ 
+& CopperDroid\cite{tam2015copperdroid} & \xmark \\ 
+  & HackApp \cite{apphack} & \xmark \\
+& NVISO ApkScan \cite{nviso}& \cmark \\ 
+& Koodous  \cite{koodus}& \cmark \\
+& VirusTotal \cite{total2012virustotal}& \cmark \\
+& Joe Sandbox mobile \cite{joesandbox} & \cmark \\
+& ForeSafe & \xmark \\ \hline
+\multirow{2}{*}{Antivirus} & Bit Defender & \cmark \\
+& 360 mobile & \cmark \\ 
+& TrendMicro & \cmark \\
+& Kaspersky & \cmark \\ 
+& Tencent mobile & \cmark \\ 
+\hline
+\multirow{1}{*}{App store} & Amazon \cite{amazon} & \cmark \\
+\hline
+\end{tabular}
+\label{tab:sandbox}
+\end{table}
+
+We receive the environment-related data from 80\% of available sandbox in the Table \ref{tab:sandbox}. Table \ref{tab:contact} and Table \ref{tab:sms} show a summary of the most relevant environment-related data collected by our testing app. The former contains results of Contact data while the latter contains results of SMS data. Both Tables have the last two columns in common which report whether the specific sandbox does dynamically generates the environment-related data (Random data column) and count the number of collected results (num. of results column) respectively. As for Table \ref{tab:contact} we reported name, number and email were collected by the analysis, instead in Table \ref{tab:sms} we included sending number and body if any. We have not included the phone call data since all sandboxes return the empty result. Thus, the phone call data could be one of the best user-profile fingerprints. 
+
+As describe in Section \ref{sec:design}, our system allows us to detect if a target sandbox returns a fixed data for a specific \textit{environment artifact}. Unfortunately, as shown by "Random Data" column in Table \ref{tab:contact} and \ref{tab:sms}, the results indicate that most Android sandboxes do not use dynamically generated environment data.
+
+One interesting finding is that two mobile anti-virus sandboxes ran the application on a real-world device. In fact, they returned concrete \\
+\textit{Wi\-Fi artifact} data (i.e. "wifiscan":"DIRECT\-Cn\-FireTV\_8048",\\
+"wifiscan":"AppStore","wifiscan":"AVcontrol"). \\
+Moreover, the data collected from the \textit{battery artifact}, presented in Table \ref{tab:battery} is exactly the same for all the sandbox, except for the data returned by these two anti-virus sandboxes. In fact, an unmodified Android emulator returns a fixed battery stats, which consists of the following string: \\
+"chargePlug":"1","batteryStat":"2","batteryLevel":"50.0". \\
+Instead, results collected from a real-world device look like different: \\
+"chargePlug":"2", "batteryStat":"3", "batteryLevel":"100.0". \\ 
+Regarding \textit{application artifact} data, we found that about 77\% of targets the sandboxes contain the identical set of applications found on stock Android emulator. As Tables \ref{tab:apps} shown, some anti-virus and all online sandboxes present only the default installed app list from the Android emulator, and they never return random data for the installed app list. \\
+
+In the following list, we include some interesting apps' package name:
+
+\begin{itemize}
+\item com.amazon.geo.contextcards
+\item com.amazon.rialto.cordova.webapp. 	\\	webapp50f95ccb054443059066310aefdf969b 
+\item IAPV2AndroidSampleAPK
+\item com.amazon.otaverifier
+\item com.tencent.token
+\end{itemize}
+
+
+
+
+\begin{table*}
+\centering
+\caption{Contacts usage-profile Results}
+\begin{tabular}{|c|c|c|c|c|c|} \hline
+Sandbox & Name & Phone & Email & Random data & num. of results\\ \hline
+\multirow{2}{*}{store\_1} & Mary Edwards & 867-5309 & \xmark & 
+\multirow{+2}{*}{\xmark} & \multirow{+2}{*}{2}\\
+& Harry Grace & 867-5319 & \xmark & &\\ \hline
+online\_x & \xmark & \xmark & \xmark & \multirow{+1}{*}{\xmark} & \multirow{+1}{*}{1} \\ \hline	
+\multirow{+3}{*}{online\_y} & Firstname1 & 1 301-234-5678 & \xmark &
+\multirow{+3}{*}{\xmark} & \multirow{+3}{*}{3}\\
+& Firstname2 & 1 381-234-5678 & \xmark & &\\
+& Firstname3 & 1 381-234-5678 & \xmark & &\\ \hline
+\multirow{3}{*}
+{av\_1} & Ion & 074-354-3219  &  \xmark & 
+\multirow{+2}{*}{\xmark} & \\
+& Gheo & 072-345-6789 & \xmark & & 4 \\ 
+& Txet4321 & 074-212-3456 & \xmark & & \\ \hline
+\multirow{4}{*}
+{av\_2} & Cynthia & \xmark & \xmark &
+\multirow{+4}{*}{\xmark} & \multirow{+4}{*}{2}\\ 
+& Alexander  & \xmark & \xmark & & \\ 
+& Alexandra & \xmark & \xmark & & \\
+& Dolores & \xmark & \xmark & & \\ \hline 
+\multirow{1}{*}{av\_3}& MARS & 1 566-666-6666 & chengkai\_tao@****.com.cn &
+\multirow{+1}{*}{\xmark} & \multirow{+1}{*}{10}\\ \hline
+\multirow{3}{*}{av\_4} & Boulder Hypnotherapy Ctr & (303) 776 8100 & z**y@gmail.com & 
+\multirow{+3}{*}{\cmark} & \multirow{+3}{*}{36}\\
+& St. John Ambulance & 061 412480 & l**k@stjohn.ie& &\\
+& Maidstone Golf Centre & 01622 863163 & nick@totalgolfcoaching.co.uk & &\\  \hline
+\multirow{3}{*}{av\_5} & Jian Li & 1 3743888229 & lijxev@admin.cn & 
+\multirow{+3}{*}{\cmark} & \multirow{+3}{*}{20}\\
+& Jian Li & 13606500401 & b0***54@admin.cn & &  \\
+& Xuri Jin & 13250324837 & 55**43@yuepao.cn & &\\ \hline
+\end{tabular}
+\label{tab:contact}
+\end{table*}
+
+
+\begin{table*}
+\centering
+\caption{SMS usage-profile Results}
+\begin{tabular}{|c|c|c|c|c|} \hline
+Sandbox & Num  & Body & Random data & num. of results\\ \hline
+\multirow{3}{*}{store\_1} & 2020845845 & Hey & 
+\multirow{+3}{*}{\xmark} & \multirow{+3}{*}{3}\\
+& +18454119384  & Who &  &\\
+& 5618675309  & Important & &\\ \hline
+\multirow{1}{*}{online}& 
+\xmark & \xmark & \xmark & \multirow{+1}{*}{1}\\ \hline	
+\multirow{2}{*}{av\_1} & 12345 & smsmomealain & \multirow{+2}{*}{\xmark} & \multirow{+2}{*}{2}\\
+& 1234 & smsmomealain  & & \\ \hline
+\multirow{2}{*}{av\_2} & 1354-587-2365 & Mum & 
+\multirow{+2}{*}{\xmark} & \multirow{+2}{*}{2}\\ 
+& 1857-667-8565 & Jefferson& &\\  \hline
+\multirow{3}{*}{av\_3} & 1301-234-5678 & Ggggggggg & 
+\multirow{+3}{*}{\xmark} & \multirow{+3}{*}{12}\\
+&1301-234-5678 & Testzzzzzz &  &\\
+&1381-234-5678 & 123456789& &\\ 
+&1581-234-5678 & Fffffffffmmmmmm & &\\ \hline
+\multirow{4}{*}{av\_4} & 10668820 & guchulaichonghuafei &
+\multirow{+4}{*}{\cmark} & \multirow{+4}{*}{15}\\ 
+& 10086  & nihao,laikaitong4g-songliuliango & &\\ 
+& 13770837893  & nihao,nishi4staryonghu,keyihuantingji & &\\ \hline 
+\multirow{3}{*}{av\_5}&13540877911&u0oydyemvub4lu86kfcbwad46pvhmh6o & \multirow{+3}{*}{\cmark} & \multirow{+3}{*}{22}\\ 
+&15874984303 & 2fqjfkr629blowmxso4jh6dzqtk3f4j2 & &\\
+&18660928896 & lhb0j8hxi48wdjiua1q0qvsleeffgt6g & &\\
+\hline
+\end{tabular}
+\label{tab:sms}
+\end{table*}
+
+
+\begin{table*}
+\centering
+\caption{Battery usage-profile Results}
+\begin{tabular}{|c|c|c|} \hline
+Sandbox & Battery stats & Random data  \\ \hline
+av\_1 & batteryStat'='3, 'chargePlug'='2', batteryLevel = '100' & \cmark  \\ \hline
+av\_2 & batteryStat'='2, 'chargePlug'='1', batteryLevel = '98' & \cmark  \\  \hline
+online, store & batteryStat'='2','chargePlug'='1','batteryLevel'= '50.0' & \xmark \\ 
+\hline
+\end{tabular}
+\label{tab:battery}
+\end{table*}
+
+\begin{table*}
+\centering
+\caption{Installed Apps usage-profile Results}
+\begin{tabular}{|c|c|c|c|} \hline
+Sandbox & Emulator apps & uncommon apps  & Random data\\ \hline
+av\_x & \cmark & \cmark & \xmark \\ \hline
+av\_y & \cmark & \xmark & \xmark \\ \hline
+store & \cmark & \cmark & \xmark \\ \hline
+online & \cmark & \xmark & \xmark \\ 
+\hline
+\end{tabular}
+\label{tab:apps}
+\end{table*}
+
+

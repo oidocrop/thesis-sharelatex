@@ -1,0 +1,18 @@
+MicPolicy : AppX can do getMicrophone on Microphone
+						have to perform checkLocation();
+            if isWorkHours() == True
+
+LocPolicy : AppX can do getLocation on Location
+						have to perform checkLocation();
+            if isWorkHours() == True
+           
+ContPolicy: AppY can do getContacts on Contacts
+						have to perform filterOut();
+            if isWorkHours() == True and isLocation() == True
+            
+HTTPPolicy: AppZ can do createConnection on Internet
+						have to perform forceHTTPS()
+            if isWorkHours() == True
+
+CopPolicy : AppX can do runApp on Boot
+						have to perform checkApp();

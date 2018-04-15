@@ -1,0 +1,107 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Motivating example}
+\label{sec:prob}
+
+% In the last year, several applications have been removed from the GooglePlay store due to their malicious behavior. Moreover, malware authors have started to improve the techniques used in their product to hide its malicious behavior by means of either obfuscation or dynamic code loading capabilities. 
+
+%have started to improve the techniques used in their product to hide its malicious behavior by means of either obfuscation or dynamic code loading capabilities. 
+%Therefore, they cannot detect suspicious data passed in via an Intent between two different Android components.
+
+The rising use of techniques such as obfuscation and ICC for information leakage by newly found malware motivates this work. Existing analysis approaches generally do not support information-flow analysis across multiple app components in obfuscated apps. As a result, malware use these features for evading these analysis tools. As reported by different antivirus companies \cite{acecard,adware,adwaregplay,vbmalware,rumms}, obfuscated malware has started to show up more frequently. This trend poses a strong challenge for the current static analysis tools, which are unable to automatically analyze apps in the presence of obfuscation or dynamic code loading. Furthermore, as demonstrated in \cite{li2015iccta}, the ICC mechanism offered by Android is used by both normal and malicious apps for passing data between different Android components. 
+%\cite{parasites},
+% Beside that, current state of the art tool based on hybrid approach \cite{backes2016r,rasthofer2016harvesting} are not able to automatically detect suspicious flows between different components due to the lack of support for ICC. 
+%Our hybrid approach, like \cite{backes2016r,rasthofer2016harvesting}, follows the process of extract-then-execute interesting code extracted 
+
+
+
+\iffalse
+\begin{figure}[ht!]
+\centering
+\lstinputlisting[language=Java,label={lst:test1}]{listings/malware1.java}
+\caption{MessageReceiver}
+\label{fig:mlw1}
+\end{figure}
+\fi
+
+\lstinputlisting[language=Java,label={lst:m1w1}, caption={MessageReceiver}]{listings/malware1.java}
+
+\iffalse
+\begin{figure}[ht!]
+\centering
+\lstinputlisting[language=Java,label={lst:test1}]{listings/malware2.java}
+\caption{SendService}
+\label{fig:mlw2}
+\end{figure}
+\fi
+
+\lstinputlisting[language=Java,label={lst:m1w2}, caption={SendService}]{listings/malware2.java}
+
+To ease the understanding of our contributions, we are going to introduce a code snippet of a real-malware sample reported by FireEye in \cite{firemalware}. Listing \ref{lst:m1w1} shows the de-obfuscated version of the code used to intercept and then report the incoming SMS. The forwarding process is defined in a service component. The \emph{MessageReceiver} (line 2) is called for each incoming SMS and then an Android service is started by an Intent (line 12). The number and text data are stored within the Intent (lines 10, 11). Note that the original obfuscated malware uses string encryption on the constant string along with Java reflection for calling ICC methods. Then the started service, shown in Listing \ref{lst:m1w2}, gets data from the incoming Intent (lines 5, 6) and leaks (line 14) SMS number and text via a remote server connection (the server IP address string was obfuscated as well).
+
+% TOOLNAME permits to automatically extract and then execute the relevant instructions which compute the value at the POI. The ICC flow is first detected to build the SDG and then used to  drive the backward-slicer across different components. Moreover, TOOLNAME automatically detect the component's type where the backward-slicing process ends.  This information is used along with the Manifest data, to automatically trigger specific system events (i.e., incoming sms, etc\ldots).
+
+To the best of our understanding, static analyzers \cite{octeau2013effective,octeau2015composite,li2015iccta,gordon2015information}, are not successful in analyzing such cases because of both encryption and reflection techniques used by this malware sample. Moreover, also hybrid approaches proposed in \cite{rasthofer2016harvesting} and \cite{backes2016r} cannot properly analyze the sample because they lack support for ICC. 
+
+%In the following section we describe how our iterative approach based on a combination of static and dynamic analysis can solve the problem.
+
+
+
+% Listing \ref{fig:outact},\ref{fig:inact} show code snippets taken from DroidBench \cite{droidbenchpage} suite. It is an open test suite for evaluating the effectiveness of taint-analysis tools. It is, basically, a collection of several  apps which leak sensitive data exploiting different Android features (like Android activity lifecycle, callback, thread, ICC, etc\ldots). Even if it is mainly intended for a different purpose (the evaluation of taint-analysis tools), in the following we are going to use ICC-base Droidbench apps (included in \emph{InterComponentCommunication} test case) to ease the understanding of our approach. We obfuscated those apps using the Dexguard \cite{dexguardpage} tool exploiting different techniques like Java reflection and string encryption. Then, instead of looking for a flow between source and sink methods, our goal is to automatically extract the malicious behavior, which involves ICC mechanism, from the obfuscated app.
+
+% \begin{figure}[ht!]
+% \centering
+% \subfigure[Multiple Method Slice]{
+% \centering
+% \lstinputlisting[language=Java,label={lst:test1}]{listings/ActComm7.java}
+% \label{fig:outact}
+% }
+% ~%Nothing
+% \subfigure[Inline Slices]{
+% \centering
+% \lstinputlisting[language=Java,label={lst:test1}]{listings/ActComm7_2.java}
+% \label{fig:inact}
+% }
+% %~%Nothing
+% %\subfigure[Inline Slices]{
+% %\centering
+% %\lstinputlisting[language=Java,label=%{lst:test1}]{listings/ActComm7_3.java}
+% %\label{fig:slices}
+% %}
+% \caption{Slice Categories; \textit{E}: Entrypoint Method, \textit{T}: Target Method, \textit{IM}: Intermediate Method, \textit{NR}: Non-relevant Method}
+% \label{fig:slice_categories}
+% \end{figure}
+
+% Listing \ref{fig:outact},\ref{fig:inact} illustrate two Activities. \emph{OutFlowActivity} which first gets a sensitive data (the IMEI number, line 7 Listing \ref{fig:outact} ) then send it to the Activity \emph{InFlowActivity}. Finally, it does data exfiltration via SMS vector (line 9 \ref{fig:inact}. The obfuscation by Dexguard encrypts the string in both Activities (lines 11,13 and 6,9) with a call to method \emph{f.e} passing in the encrypted string as argument. Moreover, Listing \ref{fig:outact} line 13, the call to startActivity method has been replaced with an indirect call via Java reflection mechanism.
+% The intent created at line 9 is exchanged between the two components by first attach the data using putExtra (line 11) method and then by invoking the ICC method startActivity (line 13).
+
+
+% As discussed before, all existing approaches \cite{octeau2015composite,octeau2013effective,rasthofer2016harvesting,li2015iccta,backes2016r} fail the analysis because either they can not detect flow between different Android components, or because of its obfuscation. This consideration holds for hybrid approaches like Harvester \cite{rasthofer2016harvesting} and R-Droid \cite{backes2016r} as well. Both of them will also fail in the analysis because they can not properly follow ICC flows. 
+
+%However, our approach XXX allows the extraction of data-dependent slices following the ICC flow across the two Activities. Listing \ref{fig:slices} shows the resulting slice generated by XXX, it shows the corresponding aggregate Java code to ease the understanding.
+%XXX performs backward slicing starting from the POI, sendTextMessage method, looking for data-dependency on both the first and third arguments (respectively message's number and body). The instructions which are linked with that arguments are added during the slicing process. Finally, only the instructions which participate in the computation of the target arguments are included in the resulting slice, Listing \ref{fig:slices}. 
+
+
+% It is often desired to dynamically execute an application to test it for possible errors, vulnerabilities and malicious activities. Checking an app for possible malicious activities is one of the foremost duties of an app store. More specifically, an app store is required to make sure that the published apps are free of malicious contents. Therefore, app stores do have some sort of scanning mechanism which analyzes apps statically/dynamically.
+
+% Static analysis most of the times provides an over approximation of the behavior of an app under test. So, static analysis might declare an app malicious which might be benign. In contrast, the behavior of an app estimated using dynamic analysis provides an exact idea about what an app is capable of doing. However, dynamic analysis requires to stimulate an app with proper test cases which could expose the complete behavior of the app, which is most of the times ungainly and does not scale well due to the huge number of the apps.
+
+% However, it is some times more desirable to stimulate only specific parts of an app and not the app as whole, e.g., some sensitive APIs which access phone resources or send data to the outside world, some pieces of code which may produce errors, some specific APIs which update the app's code dynamically, etc. This gives rise to the problem of generating targeted test cases which could stimulate the desired target piece of code. 
+
+
+
+% This work aims to solve the mentioned problem and contributes as listed below.
+% \begin{itemize}
+
+% \item A novel idea which could move forward the state-of-the-art in targeted triggering. The idea is to move towards environment independent targeted triggering rather than providing the exact environment/inputs required for triggering, i.e., instrument/enrich the app in a manner that makes it take the required paths when launched.
+
+% \item Design and implement an automated system, TExeDroid for Android apps based on the proposed idea which takes an APK file and a list of target APIs and ensures that the code path leading to these target APIs are stimulated while dynamically executing the app on a device or an emulator.
+
+% \item TExeDroid can be easily coupled with state-of-the-art dynamic analysis tools to get better results. As a use case, we couple TExeDroid with StaDyna to resolve the targets of reflection and dynamic code loading for capturing the runtime behavior of Android apps.
+
+% \item We collect a dataset of X Android apps (containing  X1 malicious and X2 benign apps). We evaluate TExeDroid with the collected dataset of apps and report our findings.
+
+% \end{itemize}
+
+%\item Most of the tools for analyzing Android apps are based on their counterparts developed for Java applications and therefore, the Dalvik bytecode of Android apps needs to be translated to Java bytecode for analysis. The state-of-the-art tools for translating Dalvik bytecode to Java bytecode are not very much matured. Therefore, we try to perform all the analysis on a Smali level (a closer and more precise representation of the Dalvik bytecode). Performing all the analysis on Smali level leads to a more accurate and a less expensive solution.
+
+

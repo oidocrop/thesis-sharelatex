@@ -1,0 +1,49 @@
+\section{Application Scenario} \label{sec:app-scenario}
+
+In this section, we provide a motivating example to highlight the advantages of our approach. The example refers to the enterprise domain where services like MAMs and MDMs are usually deployed to manage devices and apps used by employees.  \\
+
+Here we stress that \asd's main goal is to be able to enforce security-and-privacy policies for customising the behaviour of  apps without modifying their code. 
+\asd is not a mobile malware detector. Anti-malware solutions are complementary to \asd. \asd is an enterprise tool used to customise the security policy of the mobile applications employees run.
+Such customisations are required because the enterprise may need to monitor and possibly restrict the benign app behaviour or the use of some features of the app, due to local legislation (e.g., privacy-related regulations) and/or enterprise security policies (e.g., banning the use of WiFi in particular contexts). 
+
+\iffalse
+\begin{figure*}[b]
+\centering
+\subfigure[app distribution model]{
+\centering
+\includegraphics[width=.35\textwidth, keepaspectratio, resolution=600]{1}
+\label{fig:before}
+}
+~%Nothing
+\subfigure[\asd distribution model]{
+\centering
+\includegraphics[width=.35\textwidth, keepaspectratio, resolution=600]{system_model_after}
+\label{fig:after}
+}
+\caption{App distribution: (a) default scenario , (b) \asd in place}
+\label{fig:appdistribution}
+\end{figure*}
+\fi
+
+The scenario involves the following parties: (i) a developer $Dev$ and (ii) an enterprise $Ent$.
+Let us assume that $Dev$ has created an app $A$ that $Ent$ wants to use. 
+To wrap an app with a traditional MAM service, one has to have access to the source code of the app or the developer needs to apply the sandbox while developing her own app.
+Unfortunately, $Ent$ \textbf{does not} have the source code of $A$, that could be heavily obfuscated, and $Dev$ does not want to release the source due to IPR reasons. $Dev$ is also not interested in customising $A$ using a wrapper $sandbox$  because of the extra resources needed for managing the customised version of $A$ and the cost of supporting further updates. 
+
+\textbf{\asd.} In such a scenario, our approach can be useful. We envision the developer's cooperation to offer a \asd compatible version of $A$. 
+However, $Dev$ does not need to branch any new version of $A$ or to include third-party library/code within the app. The only action needed is to run $A$ through our \stubMaker (more details will be provided in Section \ref{sec:stubfactory}).  This component takes $A$ as input and returns two apps: the \stub $A'_{stub}$  and $A'$. The $A'_{stub}$ will generate the sandbox where $A'$ will be executed (details will be discussed in Section \ref{sec:stub}). Here we stress that $A'$ is an exact copy of $A$ except for a slightly different manifest file automatically modified by the \stubMaker component. Moreover, it is important to note that \stubMaker neither  modifies $A$'s bytecode nor inserts any additional code in the app. The \stubMaker can take as input also the obfuscated version of $A$. 
+
+At this stage, $Dev$ has to sign $A'_{stub}$ and $A'$ by a fresh generated self-signed certificate $K$. Finally, the signed new apps can be distributed so that \textit{Ent}, which owns the right for the certificate $K$, is able to retrieve it. 
+
+When $Dev$ releases a new version of $A$, the only step required is to create a new version of $A'$. This process is fully automated by means of  \stubMaker which produces the new version of $A'$. Each time $Dev$ releases a new app's update she goes through this automated procedure in order to create the \asd compatible app, but differently from the first release there is no need to update and distribute $A'_{stub}$ again, because the stub code does not change upon to app's update. Finally, $Dev$ signs the new version of $A'$ with the digital certificate that has been used to sign the previous version of the app. 
+
+\asd allows $Ent$ to monitor and possibly restrict the behaviour of $A'$. The specification of what to monitor, how and what to enforce can be done by $Ent$ by writing behavioral policies for \asd. Fine grained policy capability offered by \asd 
+become even more relevant in scenarios such those depicted by the recently introduced European regulation, the General Data Protection Regulation (GDPR) \cite{gdpr}. In the following, we provide two examples of such policies: 
+
+\begin{itemize}
+\item Default enterprise security and privacy policies. This set of policies must be enforced on any app the employee installs on her phone. These policies enforce corporate-related data (i.e., contacts, calendar), copy/paste protection, corporate authentication, app-level VPN, data wipe and run-time integrity check, no HTTP connections.
+
+\item Access restrictions to selected system resources. In some locations or in some circumstances (e.g., meeting) apps may be prevented access to some system features of the phone (e.g.,, alarm, wifi connectivity, camera, mic, etc.) 
+
+\end{itemize}
+We will show later in the paper how, in detail,  \asd  expresses and  implements such policies.

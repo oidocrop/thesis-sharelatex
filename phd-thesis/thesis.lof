@@ -1,0 +1,20 @@
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {4.1}{\ignorespaces SDG during the first and second iteration. Comp: Component\relax }}{33}{figure.caption.7}
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {SDG - First Iteration}}}{33}{figure.caption.7}
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {SDG - Second Iteration}}}{33}{figure.caption.7}
+\contentsline {figure}{\numberline {4.2}{\ignorespaces TeICC Design\relax }}{36}{figure.caption.8}
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {5.1}{\ignorespaces AppBox\nobreakspace {}design phases: Preparation , Distribution and Execution.\relax }}{49}{figure.caption.10}
+\contentsline {figure}{\numberline {5.2}{\ignorespaces StubFactory and its components\relax }}{50}{figure.caption.11}
+\contentsline {figure}{\numberline {5.3}{\ignorespaces AppBox\nobreakspace {}enforcing managed apps\relax }}{53}{figure.caption.14}
+\contentsline {figure}{\numberline {5.4}{\ignorespaces AppBox\nobreakspace {}Policy Language\relax }}{55}{figure.caption.16}
+\contentsline {figure}{\numberline {5.5}{\ignorespaces AppBox\nobreakspace {}Policies\relax }}{56}{figure.caption.17}
+\contentsline {figure}{\numberline {5.6}{\ignorespaces Policy generation mechanism. Res.: sets of Resource, Op: sets of operation\relax }}{58}{figure.caption.19}
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {6.1}{\ignorespaces The design of fingerprint collector\relax }}{69}{figure.caption.25}
+\contentsline {figure}{\numberline {6.2}{\ignorespaces Scouting apps generator\relax }}{69}{figure.caption.26}
+\addvspace {10\p@ }
+\addvspace {10\p@ }

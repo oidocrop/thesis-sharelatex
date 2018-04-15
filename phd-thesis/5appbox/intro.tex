@@ -1,0 +1,46 @@
+\chapter{AppBox}
+In the past decade, mobile computing has gone from a niche market of gadget-driven consumers to the fastest growing, and often most popular, way for employees of organisations of all sizes to do business computing. 
+
+In many cases, expensive company-owned laptops have been replaced by cheaper phones and tablets often even owned by the employees (so called Bring Your Own Device). Business applications are quickly being rewritten to leverage the power and the ubiquitous nature of mobile devices. Mobile computing is no longer just another way to access the corporate network: it is quickly becoming the dominant computing platform for many enterprises.
+  
+In this scenario, it is important for the IT security department of the enterprise to be able to configure secure policies for its employees' devices. Mobile Device Management (MDM) and Mobile App Management (MAM) services are the $de$ $facto$ solutions for IT security administrators to enforce such enterprise policies on mobile devices.
+
+MDMs enforce policies at the device level and do not cater for specific services and apps that an enterprise might want to protect. MDMs enforcement is  limited by the APIs  provided by the OSes. MAM solutions provide policies that are app-specific and often require the enterprise to acquire new apps. To be managed by an MAM, the code of an app needs to be customised using specific software development kits (SDKs) provided by MAM vendors. 
+
+An enterprise investing in a MAM solution has to consider not only the type of security policies that it is able to enforce but also the portfolio of apps that are already supported. To this end, MAMs provide Software Development Kits (SDKs) that enable an app developer to customise her app so that it can be managed by a specific MAM solution.  
+
+Usually, MAM providers expand their offering of supported apps over time. 
+However, the pace at which MAMs expand the list of  supported apps might not match the timing needs of an enterprise. 
+
+Alternatively, an enterprise might approach the  developer of an app to ask for costly customisations to fulfill its security needs. In general, app customisations are not affordable due to the cost associated with maintenance and support. Due to the fast pace at which the app markets evolve, developers might not be too keen in engaging in such relationships. On the other hand of the spectrum, large enterprises might have the resources to implement their own customisations. However, in this case the developer should disclose to the enterprise the source code of the app. 
+   
+
+In this paper, we propose a MAM solution that would enable an enterprise to select any app from the market and to be able to perform customisation with minimum collaboration from the app developer. 
+Particularly, the developer will not have to disclose the app source code to the enterprise nor should she be involved with code customisations for satisfying the enterprise security requirements.
+
+We achieve this goal by introducing \textbf{AppBox}, a novel lightweight app-level customisation solution for stock Android devices.
+Using $\asd$, an enterprise can customise any existing app, even highly-obfuscated ones, without using any SDK or modifications to the app code.
+\asd allows an enterprise to define and enforce app-specific security policies to meet its business-specific needs.
+More importantly, \asd works on any Android version without requiring  root privileges to control the app behaviour.
+
+\asd requires the developer to just modify two attributes in the manifest file of her app: the \texttt{android:process} and \texttt{android:sharedUserId}.
+\asd provides tools for the developer to perform with minimal effort these changes in a fully automated manner.
+
+
+As for any other MAM solution, the basic assumption in \asd is that the enterprise trusts the developer to deliver a benign app and uses \asd for customisation purposes.
+It is up to the enterprise to collaborate with reputable developers to deliver apps that will not include malicious logic. 
+
+
+To summarise, our contributions can be listed as follows: 
+
+\begin{enumerate}
+\item We propose \asd as an MAM solution that enables an enterprise to customise any Android app without modifying the app code. Unlike traditional enterprise mobility management solutions, \asd is able to enforce dynamic policies without requiring integration with SDKs or other code modifications. Thus, it can work also on heavily obfuscated apps.
+
+\item By using dynamic memory instrumentation, \asd monitors and enforces fine-grained security policies at both Java and native levels.
+
+\item \asd works on stock Android devices and does not require root privileges. This is ideal especially for enterprises that support Bring Your Own Device (BYOD) policies.  
+
+\item We have implemented \asd and performed several tests to evaluate its performance and robustness on 1000 of the most popular real-world apps using  different Android versions, including Android Oreo 8.0. 
+
+\item We released \asd as an open source project available at the following URL\footnote{ \url{https://vaioco.github.io/projects/}}.
+\end{enumerate}

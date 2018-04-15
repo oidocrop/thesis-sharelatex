@@ -1,0 +1,169 @@
+\section{Evaluation}
+In this section, we discuss the evaluation we carried on to test performance overhead, robustness, applicability and effectiveness of \asd. For our tests, we used a Nexus 5x (64bit) device running stock Android Oreo version 8.0.0.
+
+\subsection{Performance Overhead}
+To evaluate \asd performance penalty on managed apps, we used benchmark apps and our custom micro-benchmarks. As benchmark apps, we used Quadrant and  Vellamo\footnote{\url{https://play.google.com/store/apps/details?id=com.quicinc.vellamo}}: the former was selected because it has been used in other related works \cite{russello2013firedroid,backes2015boxify,bianchi2015njas} so it will make easier to compare the performance of \asd with similar approaches; the latter is a highly accurate benchmark developed by Qualcomm and contains a benchmark specifically intended for stressing the Binder communication channel. Given that the Binder is the most common means of communication for Android apps, it is important to measure the overhead \asd  introduces. Moreover, we executed the \textit{webview} package of Vellamo that contains various benchmarks for Android's Webview API. We included this test in our experiments because a huge number of apps are either entirely developed within a Webview or specifically use its features. 
+
+As shown in Table \ref{tab:perf1}, the impact of \asd on the total score produced by the benchmarks is low. The test marked as \textit{total} reports the cumulative score that the Quadrant benchmarking app produced when executed, while the I/O test were oriented to stress operations of reading/writing from/to disk. The worst score, of about 15\% is low when compared to similar works, and can be  attributed to the I/O test. It is worth to note that in both scores, \asd overhead is much lower than the one introduced by solutions like Boxify and NJAS in equivalent tests. In fact employing a light-weight in-memory hooking mechanism, instead of ptrace, and 
+avoiding critical services emulation via Broker component, \asd reduces remarkably the performance costs requested for monitoring the target app.
+
+As for the performance penalty introduced in the Binder communication (indicated as multi-core in Table \ref{tab:perf1}), the score indicated by the Vellamo benchmark is really low (up to 1\%) due to the fact that \asd does not need to perform extra marshalling operations. It would have been interesting to report the same tests for  NJAS and Boxify\footnote{At the time of writing this paper, a version of Boxify was released but it's not based on the isolated process mechanism as described in \cite{backes2015boxify}} 
+but both systems were not available to us at the time of writing. 
+
+To understand the performance implication of \asd on method invocations and function calls, we developed a synthetic app in order to perform a micro-benchmark testing performance penalties when executing Java and native method calls. The micro-benchmark tests the most significant native functions by means of \asd native interceptors. In Table \ref{tab:perf_native}, we report  the overhead introduced by \asd when hooking  functions in libc (shown in the first column). In the same table, we also compare our overhead with  Boxify performance overheads as reported in \cite{backes2015boxify}. As the results show, \asd's performance overhead is significantly less than Boxify's, mainly because of the extra rounds trip needed by Boxify to forward to the the Broker component each intercepted calls which costs in average $\approx$ 100 $\mu$s of delay for each call. 
+
+Table \ref{tab:perf_api} reports the results for the overhead introduced by \asd when interposing Java Android APIs, Table \ref{tab:perf2} presents hooks that were in place during our experiments. Results shows that the performance penalty introduced by \asd's API Hooking, while not being ideal, is acceptable. It is worth noting that micro-benchmarks test listed in Table \ref{tab:perf_api} in some cases (i.e., openFileOutput and Create File) are responsible for triggering multiple hooks. A very fast operation such creating a new File object has a performance degradation which cost in average 10 $\mu$s of delay. The \asd Java interceptor's performances not being ideal compared to the native interceptor's, this is an expected result because of the API hooking mechanism employed by \asd , that relies on Java reflection for invoking the original method reference.
+
+
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+
+\begin{table}[!htbp]
+%\begin{minipage}{.5\textwidth}
+\caption{BenchMark Apps Results For Nexus 5x (64 bit)}
+\label{tab:perf1}
+\centering	
+\begin{tabular}{@{}ccccc@{}} \toprule
+App & Test & AppBox & Native & Loss \\
+\cmidrule(l){1-5}
+\multirow{2}{*}{Quadrant} & Total & 17736 & 17449 & 1.6\% \\ 
+& I/O &  9820  &  8277 &15.7 \%  \\ 
+\cmidrule(l){1-5}
+\multirow{2}{*}{Vellamo} & multi-core & 1948 & 1930 & 0.9 \%  \\
+& webview & 2803 & 2688 & 4.1 \% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+
+\begin{table*}[b]
+\caption{Native Micro-Benchmarks \asd Performance, Compared against Boxify.}
+\label{tab:perf_native}
+\ra{1.3}
+\begin{minipage}{1\textwidth}\centering
+\begin{tabular}{@{}c|c|c|c|c|c|c@{}}
+\toprule
+\multicolumn{4}{c|}{AppBox: Nexus 5x (250k runs)} & \multicolumn{3}{c}{Boxify: Nexus 5 (15k runs)} \\ 
+\cmidrule(l){1-7}
+%\cmidrule(l){5-7}
+Libc. Func. & Native & on \asd & Overhead & Native & on Boxify & Overhead \\
+\cmidrule(l){1-7}
+%\cmidrule(l){5-7}
+open & 6.49 $\mu$s & 6.7 $\mu$s & 3.2\% & 9.5 $\mu$s & 122.7 $\mu$s & 1191\% \\
+%$\approx$ 10x \\
+mkdir & 92.7 $\mu$s & 95.2 $\mu$s & 2.7\% & 88.4 $\mu$s & 199.4 $\mu$s & 125\% \\
+%$\approx$ 1.2x \\
+rmdir & 80.7 $\mu$s & 85.3 $\mu$s & 5.7\% & 71.2 $\mu$s & 180.7 $\mu$s & 153\% \\ 
+%$\approx$ 1.5x \\
+%cremove & 74.1 $\mu$s & 85.7 $\mu$s & 15.6\% & 49.5 $\mu$s & 159.6 $\mu$s & 222\% \\
+%$\approx$ 2.2x \\
+\bottomrule
+\end{tabular}
+\end{minipage} 
+\end{table*}
+
+\begin{table*}[b]
+\ra{1.3}
+\begin{minipage}{.5\textwidth}\centering
+%\begin{tabular}{@{}C{.15\linewidth}|c|c|c@{}} \toprule
+\caption{Android API - Micro-Benchmark Results}
+\label{tab:perf2}
+\centering
+\begin{tabular}{@{}c|c|c|c@{}} \toprule
+\multicolumn{4}{c}{Nexus 5x (15k runs)}  \\ 
+\cmidrule(l){1-4}
+Android API & Native & on \asd & Overhead \\ 
+\cmidrule(l){1-4}
+Read Contact & 6.55 $ms$ & 9.93 $ms$ & 3.38$ms$ (51.6\%)  \\ \hline
+Socket & 23.23 $ms$ & 26.33 $ms$ & 3.1$ms$ (13.3\%)   \\ \hline
+%Shared Pref. & 0.026  $ms$ & 2.39 $ms$ & \%  \\
+openFileInput & 0.19 $ms$ & 0.22 $ms$ & 0.03$ms$ (15,7\%)  \\ \hline
+openFileOutput & 0.24 $ms$ & 0.28 $ms$ & 0.04$ms$ (16.6\%)  \\ \hline
+Create File & 0.02 $ms$ &  0.03 $ms$ & 0.01$ms$ (50\%)  \\ \hline
+Open Camera & 227.09 $ms$ & 237.02 $ms$ & 9,93 $ms$ (4.4\%)   \\
+\bottomrule
+\end{tabular}
+\end{minipage}
+\begin{minipage}{.5\textwidth}\centering
+%\begin{tabular}{@{}c|C{.5\linewidth}|c@{}} 
+\centering
+\caption{Android APIs Monitored During Java Micro-Benchmarks}
+\label{tab:perf_api}
+\begin{tabular}{@{}c|c|c@{}} 
+\toprule
+Alias & Class package & Method name \\
+\toprule
+Read Contact & android.content.ContentResolver & query \\ \hline
+\multirow{1}{*}{Networking}
+%&java.net.URL & <init> \\ 
+&java.net.Socket & $<$init$>$ \\ 
+\hline
+\multirow{3}{*}{File}& android.app.ContextImpl & openFileInput \\ 
+& android.app.ContextImpl & openFileOutput \\ 
+& java.io.File & $<$init$>$ \\
+\hline
+%\multirow{1}{*}{Shared Pref.}& android.  app.SharedPreferencesImpl  \$EditorImpl & putString \\ \hline
+%Location & & \\ \hline
+Camera & android.hardware.camera2.CameraManager & openCamera \\
+\bottomrule
+\end{tabular}
+\end{minipage}
+\end{table*}
+
+\subsection{Effectiveness}
+During this evaluation our goal was twofold: (i) to demonstrate that \asd is easy-to-deploy and fully capable to wrap real-world apps  and (ii) to assess \asd robustness. To this end, we executed 1000 free apps from the Google Play Store (retrieved in November 2016). As reported in Table \ref{tab:stats}, the average size of those apps is around 20 MB and 66 of them (6.6\%) were recognized as obfuscated. To recognize obfuscation, we employed APKiD\footnote{https://github.com/rednaga/APKiD} that leverages on different heuristic in order to statically detect presence of packers, protectors and obfuscators. Being able to properly handle obfuscated apps demonstrate the code-agnostic property that \asd has in contrast with some similar works. 
+
+\begin{table}[H]
+\caption{Percentage of Obfuscated Apps}
+\label{tab:stats}
+\centering
+\ra{1.3}
+\begin{tabular}{>{\kern-\tabcolsep}ccc<{\kern-\tabcolsep}}\toprule
+analyzed apps & perc. obfuscated & average size \\
+\midrule
+1000 & 6.6\% & 20 MB \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+To execute our tests, we had to modify the manifest of the collected apps adding the attributes requested by \asd. This was required only for testing purposes. We stress that this step is not required in the operational scenario where the developer will be responsible for performing this task. We evaluated the runtime robustness of \asd running the collected apps on a Nexus 5x with stock Android 8.0. We employed the DroidBot\cite{droidbot} tool to exercise the managed app's functionality. Droidbot first statically analyses the target app then it allows to dynamically injects event to stimulate the app under analysis. We ran each managed apps for 5 minutes similar to the Google Play Bouncer \cite{oberheide2012dissecting} while we were collecting log information seeking for app crashes. From the 1000 apps, only 56 (5.6\%) apps reported a crash during testing.  Manual investigation of the dysfunctional apps reveled that most errors were caused by  bugs in those apps that were triggered during Droidbot dynamic stimulation. In particular, we noticed that most of the crashes were caused because Droidbot denied the runtime request for a permission causing the apps to crash.
+From this test, we can conclude that \asd did not cause any app to crash and none of the apps were negatively affected by being executed under \asd sandbox. 
+
+\subsection{Applicability and Effectiveness}
+To further stress our system to evaluate its applicability and effectiveness, we manually executed 5 of the most popular free apps from the top categories concerning business functionality. Our goal in this experiment is threefold: 
+\begin{itemize}
+\item to test the applicability of \asd on several Android versions, we run this experiment on several versions ranging from IceCreamSandwich (ICS) to Oreo;
+\item to verify the correct interaction of the managed app with the Android OS, we  completed the authentication process, if present, testing for correct delivery of system events (i.e., incoming SMS) and the interaction with Google apps such as Google Play Service;
+\item finally to stress the \asd SandboxService we manually switched it from enabled to disable to detect possible issues when the managed app is executed outside \asd.
+\end{itemize}
+
+Table \ref{tab:realapps} shows the list of apps we selected. For each app we enabled, in spirit of the scenario envisioned in Section \ref{sec:app-scenario}, the following policies. First, to monitor network-related functionalities we interposed various functions to enforce policy such as deny connections to known addresses of advertisement servers taken from a public list\cite{adware} as well as monitoring of network connections that do not make use of the secure layer offered by TLS. Second, we enable file system monitoring policies to detect file operations on the SD-card. Lastly, a fake Location Provider was in place to make \asd returning mock data to the managed app. We manually stimulated those apps for 8 minutes, performing various operations for testing functionality such as visiting web pages, acquire and share location data via GPS mechanism and user authentication through Google Play Services. It is worth of note that such authentication mechanism requires a direct communication between the apps and the Google Play Service which is a Google proprietary app, hence that communication could not be instantiate via an emulated component (i.e., the \textit{Broker} like in Boxify). 
+During such test, two experiments were performed addressing two different execution mode,  \asd with policies enabled and without them. Basically, in the latter experiment \asd  is in place but none policy is enforced, we enabled just logging operations to be reported in order to detect eventually byzantine behavior. \\
+Our tests  showed \asd effectiveness because in both experiments none of the tested apps crashed and we were able to notice the enforced behavior when policies were enabled. In fact, \asd effectively blocked any connection to the blacklisted addresses resulting in  the absence of the advertisements that instead would have been regularly showed without the enforcement of the policy by \asd, furthermore connections made without support of TLS were denied and reported correctly as well. In particular, when location policy enforcement was in place we noticed that the actual location shared via tested apps was referring to our fixed value (i.e. the North Pole) previously set via \asd. 
+
+It would have been interesting to test the update process of an app under \asd. Unfortunately, since we did not have an independent developer's cooperation during our evaluation, we were unable to properly test this aspect. \\
+
+\begin{table}[H]
+\caption{Popular Apps We Used for Testing \asd Applicability and Effectiveness}
+\label{tab:realapps}
+\centering
+\ra{1.3}
+\begin{tabular}{>{\kern-\tabcolsep}ccc<{\kern-\tabcolsep}}\toprule
+App Name & Version & Category \\
+\midrule
+Skype for business & 6.13.06&  Business \\
+\hline
+Slack & 2.30.0 & Business \\
+\hline
+Dropbox & 38.2.4 & Productivity \\
+\hline
+Intesa San Paolo Mobile Banking & 2.1.0 & Finance \\
+\hline
+Chrome & 56.0.2924.87  & Communication \\ 
+\bottomrule
+\end{tabular}
+\end{table}
+
+ 
