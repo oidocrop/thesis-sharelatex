@@ -49,7 +49,7 @@ The process of vulnerability mining is often composed by different steps as code
 This work proposes improvements to the modern analysis of Android applications, mixing a combination of static and dynamic analysis. Perhaps, mixing static and dynamic analysis produces more accurate results and allows to monitor the app being analyzed collecting concrete runtime values. Although Android applications analysis has been extensively studied in the last years, there are still several aspects that may be significantly improved. 
 
 
-\subsection{ARTDroid: a virtual-method hooking framework on Android ART runtime}
+\subsection{Virtual-Method Hooking Framework on Android ART Runtime}
 %artdroid
 
 We contribute a dynamic analysis framework for Android platform. It achieves dynamic instrumentation by altering app's virtual memory in order to insert dynamic hooks. Thanks to this technique, we begin able to monitor and control app's behaviour at runtime without any modifications to both Android framework and app's code. Dynamic instrumentation allows to divert the execution of the target method to a custom user code, both Android framework's and application's methods can be instrumented by in-memory manipulation altering the virtual-table in order to divert the intended execution flow. As introduced in Android KitKat version, the Just-in-Time (JIT) compilation of Dalvik bytecode has been replaced by the Ahead-of-Time (AOH) compilation approach as employed by the new ART runtime. This means that bytecode is compiled into native code as soon as the application is installed on the device, as consequence most of the previous dynamic techniques for the Dalvik virtual machine became ineffective.
@@ -98,7 +98,7 @@ The main contributions in this regard are enlisted here.
 \item We design and implement a hybrid analysis system based on static data-flow analysis and dynamic execution on real-world device for improved analysis of obfuscated apps.
 \end{itemize}
 
-\subsection{AppBox: Black-Box App Sandboxing For Stock Android}
+\subsection{Black-Box App Sandboxing For Stock Android}
 %APPBOX
 %appdroid
 
@@ -127,7 +127,7 @@ To summarise, our contributions can be listed as follows:
 \end{enumerate}
 
 
-\subsection{Evaluation of practical evasion of dynamic analysis systems}
+\subsection{Evaluation of Practical Evasion of Dynamic Analysis Systems}
 
 %runtime sandbox 
 Antivirus companies, search engines, mobile application marketplaces, and the security research community in general largely rely on dynamic code analysis systems that load potentially malicious content in a controlled environment for analysis purposes. We evaluate the state of the art of several on-line malware analysis services by collecting artifacts exposed by those sandbox. 
@@ -143,10 +143,10 @@ To summarize, this work makes the following contributions:
 \item 3) {\bf Mitigations.} We propose mitigations to further guide a proper design of these sandboxes against this hazard.
 \end{itemize}
 
-\subsection{OctoDroid: Discovering vulnerabilities in Android via Code Property Graph}
+\subsection{Discovering vulnerabilities in Android via Code Property Graph}
 %OCTODROID
 
-Finally, we propose a methodology aiming to enhance vulnerability mining on the Android platform by means of combining static and dynamic analysis. 
+Finally we propose a methodology aiming to enhance vulnerability mining on the Android platform by means of combining static and dynamic analysis. 
 We adopt the technique proposed by Yamaguchi et at in \cite{yamaguchi2014modeling,yamaguchi2015automatic,yamaguchi2011vulnerability} that presents a novel static analysis approach by means of Code Property Graph (CPG). This code representation enables analysts to characterize vulnerabilities as traversals in a code property graph, a joint representation of a program’s syntax, control flow, and data flow. These traversals serve as search patterns and can be expressed as queries for the graph database system. The major intuition in analyzing code via CPG is that it allows analysts building query as traversals for the underlying graph database. The graph database stores the Code Property Graph which in turn syntheses different code representations as a multigraph. This approach permits to model  potential vulnerable patterns via the query language that in turn operates on data/control flows.
 
 %approaches like fuzzing that requires to correctly reconstruct the input as expected by the application by means of mechanism that aims to increase the code coverage. Recostructing a complex data object turns out to be a quite onerous task, especially when a Inter Process Communication mechanism is in place because it requires a detailed prior knowledge about how that object layout looks like, including object's fields which might be complex objects as well. In this scenario a query-based vulnerability patterns discoverity system would help in reducing the analyst effort for analyzing large and huge codebase. 
@@ -169,6 +169,15 @@ To summarize, this work makes the following contributions:
 \end{itemize}
 
 Further work on employing CPG static information for TODO
+
+\subsection{Handling Dynamic Code Updates Using a Combination of Static and Dynamic Analysis}
+
+We propose a hybrid approach combining static and dynamic analysis to cover for the inherent inability of static analysis to deal with dynamic code updates in Android apps.
+\begin{itemize}
+\item We propose, design and implement StaDART, a system that interleaves static and dynamic analysis in order to reveal the hidden/updated behavior. By utilizing Art- Droid, we avoid modifications to the Android framework and make it largely frame- work independent. StaDART downloads and makes available for analysis the code loaded dynamically, and is able to resolve the targets of reflective calls complement- ing app’s method call graph with the obtained information. Therefore, StaDART can be used in conjunction with other static analyzers to make their analysis more precise.
+\item We integrate StaDART with DroidBot to make it fully automated and to ease the evaluation. Moreover, we analyze a dataset of 2,000 real world apps (1,000 benign and 1,000 malicious). Our analysis results show the effectiveness of StaDART in revealing behavior which is otherwise hidden to static analysis tools.
+\item We plan to release our tool as open-source to drive the research on app analysis in the presence of dynamic code updates.
+\end{itemize}
 
 %The Binder mechanism is based on a client-server paradigm where there are two main entities: a proxy and a XXX which in turn can operate as client or server so the roles are interchangeable. The client code would call the stub component which in turn forward the data within a so-called Parcel to the Binder entrypoint which is responsible to dispatch the Parcel to the requested server counterpart. The indications of how the parcel passing through the Binder is supposed to reach its destination is stored by ZZZ and it is not explicitely stated in the Android system services source code
 

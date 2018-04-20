@@ -1,0 +1,38 @@
+\chapter{StaDART: Combining Static and Dynamic Analysis}
+In this chapter, we present StaDART, an extented version of our previously proposed solution Stadyna, which combines static and dynamic analysis of Android applications to reveal the concealed behavior of malware. Unlike Stadyna, StaDART utilizes ArtDroid to avoid modifications to the Android framework. Furthermore, we integrate it with a triggering solution, DroidBot, to make it more scal- able and evaluate it with more Android applications. We present our evaluation results with a dataset of 2,000 real world applications; containing 1,000 legitimate applications and 1,000 malware samples.
+
+
+
+\section{Introduction}
+
+Ensuring smartphone users' privacy and security is a major concern and requires adequate measures from app developers, framework providers, and app stores, etc. Google's open source operating system, Android, being the most popular platform for mobile devices, uses Google Bouncer as an app vetting process at its official Google Play store. Vetting processes generally use some form of static/dynamic analysis to scrutinize apps for malicious content and Google Bouncer is no different. In addition, starting from Android 7.0, Android introduced Verify Apps, a new security feature to analyze apps downloaded from sources other than the Google Play store. 
+
+%~\cite{google-bouncer}
+
+However, a growing number of malware samples found in the Android ecosystem reveals that malware developers bypass such vetting processes using various evasion techniques. Previous research shows that the use of dynamic code update techniques along with various forms of obfuscation makes it extremely hard for the state-of-the-art analysis tools to understand the behavior of an app\cite{ExecuteThis_Poeplau2014, ahmad2016empirical}. Thus, the use of these evasion techniques in newly found malware is not surprising~\cite{brain-test}. This paper provides an empirical demonstration of the lack of effectiveness of the state-of-the-art tools when it comes to analysing apps that hide suspicious behavior using reflection and dynamic code loading. We develop a set of benchmark apps that use reflection in different ways to conceal information leakage. Our analysis of reflection-bench using some of the state-of-the-art static analysis tools shows their ineffectiveness to handle apps that use reflection. Furthermore, we develop InboxArchiver, a seemingly benign app that uses dynamic code loading to hide its suspicious functionality, and use it to test some of the most well known online analysis services. The analysis show that InboxArchiver easily bypasses these security analysis services. %\footnote{Similar proof of concept apps, which were able to 
+
+Static analysis relies on the availability of all the information at analysis time, hence, it suffers  from dynamic features and unavailability of information that are known only at execution time, e.g., the parameters used in the dynamic code update APIs. Therefore, reflection that is a programming technique widely used by mobile app developers can be only partially investigated by current  static analysis tools. As a result, reflection is usually used by malware developers to hide malicious code. The inherent limitation of  all static analyzers  (e.g., \cite{FlowDroid_Arzt2014,Saaf_Hoffmann2013}) is the operational assumption  that the code base does not change dynamically and the targets of reflection calls can be discovered in advance. This is a clear simplification of what happens in the real world, where many apps rely on code base updates instantiated only at runtime.
+
+
+There exist approaches that enhanced static analyzers of Java code to deal with the presence of dynamic code update techniques (e.g., \cite{TamingReflection_Bodden2011}). However, they cannot be  applied directly to Android due to the differences in the Java and Android platforms. The alternative of instrumenting the app offline has the  major drawback of breaking the app signature, that some apps check  at runtime. As the app starts, it checks the integrity of the signature against  a  value hardcoded in the app and terminates if the check fails. In case of malicious apps this check may be used to conceal illicit behavior. 
+
+In this paper, we present StaDART, a mobile app security analysis tool that combines static and dynamic analysis to address the presence of dynamic code updates. Instead of relying on modifications to the Android framework, StaDART utilizes a vtable tampering technique for API hooking to perform dynamic instrumentation~\cite{costamagna2016artdroid}. Furthermore, we integrate StaDART with DroidBot, a triggering tool for Android apps, to make the analysis  fully automated. StaDART is evaluated using a dataset of 2,000 real world apps (both malicious and benign) and the results of our evaluation reveal that it is more common in malicious apps to use dynamic code updates to conceal malicious behavior which is only exhibited once the app is installed on a real device. Moreover, 33\% of malware samples that use DCL introduce APIs guarded with new (not used in the initial code base) dangerous permissions in the newly loaded code, whereas the analysed benign apps do not exhibit such behavior.  
+
+\textbf{Contributions:}
+
+\begin{itemize}
+\item We present the design and implementation of StaDART, a system that interleaves static and dynamic analysis in order to reveal the hidden/updated behavior of Android apps. By utilizing vtable tampering for API hooking, we avoid modifications to the Android framework and make it largely framework independent. StaDART analyzes the code loaded dynamically, and is able to resolve the targets of reflective calls complementing app's method call graph with the obtained information. Therefore, StaDART can be used in conjunction with other static analyzers to make their analysis more accurate.
+
+\item We integrate StaDART with DroidBot to make it fully automated and to ease the evaluation. Moreover, we analyze a dataset of 2,000 real world apps (1,000 benign and 1,000 malicious). Our analysis results show the effectiveness of StaDART in revealing behavior which is otherwise hidden to static analysis tools.  
+
+\item We release our tool as open-source to drive the research on app analysis in the presence of dynamic code updates.
+%\footnote{\url{new link}}
+\item We design and develop reflection-bench, a set of benchmark apps that use reflection to conceal information leakage, and use it to test some of the state-of-the-art static analysis tools. We publish reflection-bench so that researchers can test the effectiveness of their analysis tools in the presence of dynamic features (i.e., reflection). 
+
+\end{itemize}
+
+\textbf{Paper Organization:}
+
+\S\ref{sec:info_android} provides a background on dynamic class loading and reflection in Android. 
+\S\ref{sec:refbench_dcl} discusses the design and implementation details of reflection-bench and InboxArchiver. It also provides the analysis results highlighting the shortcomings of state-of-the-art Android app analysis tools. \S\ref{sec::system_general_description} gives a high-level description of StaDART, while \S\ref{sec::implementation} covers the implementation details. \S \ref{sec:mcg_description} presents our approach to build method call graphs and visualise them. \S\ref{sec:evaluation} reports the evaluation results of StaDART on real world apps. \S\ref{sec:discussion} discusses the limitations of the current implementation, and envisages the future work. \S\ref{sec:relwork} overviews the related work, and \S\ref{sec:conclusion} concludes the paper.
+

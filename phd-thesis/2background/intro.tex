@@ -10,7 +10,7 @@ Android is a modern operating system with a layered software stack. The followin
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=.5\textwidth, keepaspectratio, resolution=600]{android-stack.pdf}
+\includegraphics[width=.5\textwidth, keepaspectratio]{android-stack.pdf}
 \caption{Android System Architecture}
 \label{fig:androidsys}
 \end{figure}
@@ -23,9 +23,11 @@ The Android OS is based on a Linux kernel but offers a different application abs
 
 The Android operating system utilizes two separate, but cooperating, permissions models. At the low level, the Linux kernel enforces permissions using users and groups. This permissions model is inherited from Linux and enforces access to  le system entries, as well as other Android specific resources. This is commonly referred to as Android’s sandbox (see XXX).
 
+
+
 Although each app executes within a dedicated process space, Android allows apps to communicate with each other through a well-defined Inter-Process Communication (IPC) mechanism, referred to as Binder. It provides message passing (called \textit{parcels}) taking care of migrating the execution of a request from the requester to the target process transparently to the apps. The Binder system includes a kernel module, accessed through the \texttt{/dev/binder} file. Communications between different components in the same app are handled by the Binder. 
 
-\subsection*{Android Framework}
+\subsection{Framework}
 
 The glue between apps and the runtime, the Android Framework provides the pieces —packages and their classes- for developers to perform common tasks. Such tasks might include managing UI elements, accessing shared data stores, and passing messages between application components. 
 
@@ -35,7 +37,7 @@ Even though almost all Android OS functionality above the kernel level is implem
 
 With a few exceptions, each system service defines a remote interface that can be called from other services and applications. Coupled with the service discovery, mediation, and IPC provided by Binder, system services effectively implement an object-oriented OS on top of Linux.
 
-\subsection*{Android Binder}
+\subsection{Binder}
 
 While Android’s Binder is a new implementation, it’s based on the architecture and ideas of OpenBinder.
 The Binder driver is the central object of the framework, and all IPC calls
@@ -46,7 +48,7 @@ Binder acts as a mediation point for all IPC. Access to system resources (e.g., 
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=.5\textwidth, keepaspectratio, resolution=600]{bindersys.pdf}
+\includegraphics[width=.5\textwidth, keepaspectratio]{bindersys.pdf}
 \caption{Android Binder Mechanism}
 \label{fig:androidmodel}
 \end{figure}
@@ -55,7 +57,7 @@ When a process sends a message to another process, the kernel allocates some spa
 
 Higher-level IPC abstractions in Android such as Intents (commands with associated data that are delivered to components across processes), Messengers (objects that enable message-based communication across processes), and ContentProviders (components that expose a cross-process data management interface) are built on top of Binder. Additionally, service interfaces that need to be exposed to other processes can be de ned using the Android Interface De nition Language (AIDL), which enables clients to call remote services as if they were local Java objects. The associated aidl tool automatically generates stubs (client-side representations of the remote object) and proxies that map interface methods to the lower-level transact() Binder method and take care of converting parameters to a format that Binder can transmit (this is called parameter marshalling/unmarshalling). Because Binder is inherently typeless, AIDL-generated stubs and proxies also provide type safety by including the target interface name in each Binder transaction (in the proxy) and validating it in the stub.
 
-\subsection*{Android Application} 
+\subsection{Application} 
 
 While all apps have the same structure and are built on top of the Android framework, we distinguish between system apps and user-installed apps. System apps are included in the OS image, which is read-only on production devices (typically mounted as /system), and cannot be uninstalled or changed by users. Therefore, these apps are considered secure and are given many more privileges than user-installed apps. System apps can be part of the core Android OS or can simply be pre-installed user applications, such as email clients or browsers. User-installed apps are installed on a dedicated read-write partition (typically mounted as /data) that hosts user data and can be uninstalled at will. Each application lives in a dedicated security sandbox and typically cannot affect other applications or access their data. Additionally, apps can only access resources that they have explicitly been granted a permission to use. Privilege separation and the principle of least privilege are central to Android’s security model, and we will explore how they are implemented in the next section. 
 
@@ -74,20 +76,56 @@ From the Linux perspective, all executables are ELF binaries. It is therefore no
 
 
 
-\subsection*{Android Security Model} 
+\subsection{Security Model} 
 Android provides a sandbox for each installed app, as shown in Figure \ref{fig:androidmodel}. To enforce this isolation at the Linux kernel, Android assigns at install time a unique User ID (UID) to each app. 
 
 Moreover, since Android version 4.3, SELinux was adopted with its Mandatory Access Control (MAC) model in order  to enforce a more fine-grained UID-based isolation and to harden the OS components mitigating the risk of flawed and malicious code.  In addition, Android combines the traditional Linux permissions with a Mandatory Access Control (MAC) mechanism at framework level. During install time, apps are assigned permission labels representing the resources they can access during runtime. The developer of an app must declare the permissions the app requires in its manifest file. SELinux can operate in one of two global modes: permissive mode, in which permission denials are logged but not enforced, and enforcing mode, in which denials are both logged and enforced. SELinux also supports a per-domain permissive mode in which specific domains (processes) can be made permissive while placing the rest of the system in global enforc- ing mode. In the Android 5.0 L release, Android moves to full enforcement of SELinux. This builds upon the permissive release of 4.3 and the partial enforcement of 4.4. In short, Android is shifting from enforcement on a limited set of crucial domains (installd, netd, vold and zygote) to everything.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=.5\textwidth, keepaspectratio, resolution=600]{android_model}
+\includegraphics[width=.5\textwidth, keepaspectratio]{android_model}
 \caption{Android Security model}
 \label{fig:androidmodel}
 \end{figure}
 
 %\textbf{Apps certificate.}  
 Android requires  all APKs to be digitally signed with a certificate. A public-key certificate contains the public key of a public/private key pair, as well as some other metadata identifying the owner of the key. The owner of the certificate holds the corresponding private key. When a developer signs an APK, the signing tool attaches the public-key certificate to the produced APK. The public-key certificate serves as a fingerprint that uniquely associates the APK to its developer and his corresponding private key. This helps Android to ensure that any future updates to that APK  come from the original developer. In fact, developers must use the same certificate throughout the lifespan of their apps to push new versions of their apps to the users' devices. In Android, a certificate authority is not mandatory: typically the app certificates do not need to be signed by a certificate authority and most developers use self-signed certificates.
+
+
+\subsection{Overview of Dynamic Class Loading} DCL provides flexibility to a developer to load classes at runtime. Similar to Dalvik, ART allows a developer to load additional code obtained from alternative locations. It allows apps to load \texttt{.zip}, \texttt{.jar} and \texttt{.apk} files containing a valid \texttt{classes.dex} file from outside the app code base, such as files stored on the internal storage or downloaded from the network. Android provides a hierarchy of class loaders which are used to load classes into app's memory.
+
+DCL is usually used for the following purposes: 
+
+\textbf{Extensibility:} As shared libraries help developers in building modular software, DCL permits to easily extend the app's capabilities such that developers can programmatically get new code running by loading it via different sources (i.e., network, persistent storage, etc.) at runtime.
+
+\textbf{App updates:} Instead of distributing updated versions of the same app, functionality provided by the current app is extended using updates downloaded through the network and loaded dynamically using class loaders.   
+
+\textbf{Common Frameworks:} Depending upon functionality, apps might use certain common frameworks, e.g., an advertisement framework, which shows advertisements to the user. Common frameworks are installed as separate apps whose code can be loaded dynamically by the reliant apps when needed. In the absence of DCL, the functionality provided by the framework must have been implemented in each of the reliant apps. Similarly, in the case of updating that common functionality provided by the framework, only the framework needs to updated rather than updating all the reliant apps. 
+
+
+\subsection{Overview of Dynamic Code Update}
+
+Dynamic code updates techniques, such as reflection and dynamic class loading, are used to extend apps' functionality at runtime. Inherited from Java into the Dalivk Virtual Machine (DVM), these features are equally supported by Dalvik's successor Android Runtime (ART). Android uses ART to run apps and system services which uses ahead of time (AOT) compilation using a dex2oat tool to convert DEX files into \texttt{.oat} binaries. ART is backward compatible with Dalvik runtime and can execute apps compiled for the DVM. 
+
+
+A growing number of malware samples found in the Android ecosystem reveals that malware developers bypass such vetting processes using various evasion techniques. Previous research shows that the use of dynamic code update techniques along with various forms of obfuscation makes it extremely hard for the state-of-the-art analysis tools to understand the behavior of an app\cite{ExecuteThis_Poeplau2014, ahmad2016empirical}. Thus, the use of these evasion techniques in newly found malware is not surprising~\cite{brain-test}.
+
+There exist approaches that enhanced static analyzers of Java code to deal with the presence of dynamic code update techniques (e.g., \cite{TamingReflection_Bodden2011}). However, they cannot be  applied directly to Android due to the differences in the Java and Android platforms. The alternative of instrumenting the app offline has the  major drawback of breaking the app signature, that some apps check  at runtime. As the app starts, it checks the integrity of the signature against  a  value hardcoded in the app and terminates if the check fails. In case of malicious apps this check may be used to conceal illicit behavior. 
+
+
+\subsection{Overview of Reflection} Reflection is the ability of a program to treat its own code as data and manipulate it during execution~\cite{ClosInContext_Bobrow1993}. Using reflection, an app can reason about and modify its execution state at runtime. The dynamically loaded code is usually accessed using reflection. Android uses the same reflection APIs as used in Java. As a result, reflection APIs can be used to retreive Class objects, access and modify Class members, create instances of Class and invoke its methods. 
+
+
+In the following, we provide an overview of what reflection offers to a developer, more details can be found in \cite{wognsen2014formalisation}. 
+
+
+\textbf{Conversion from JSON and XML representation to Java objects:} Reflection is heavily used in Android to automatically generate JSON and XML representation from Java objects and vice-versa.
+
+\textbf{Backward compatibility:} It is advised to use reflection to make an app backward compatible with the previous versions of the Android SDK. In this case, reflection is exploited either to call the API methods, which have been marked as hidden in the previous versions of the Android SDK, or to detect if the required SDK classes and methods are present.
+
+\textbf{Plugin and external library support:} In order to extend the functionality of an app, reflection APIs may be used to call plug-ins or external library methods provided at runtime.       
+
+In general, we can conclude that dynamic code loading and reflection are both highly useful and essential for apps, specifically Android apps. Thus, the widespread use of these techniques in modern Android apps is not surprising.
 
 %During a 30-day active user monitoring in September 2015, Google confirmed that Android has 1.4 billion active users globally. Android operative system has been expanding across different market segments which include automotive, smart tv and wearable devices. Dominating the smartphone market for the last few years, it reached 86.2\% of the smartphone market share in 2016. Mobile computing has gone from a niche market of gadget-driven consumers to the fastest growing way for users to perform office work, undertake banking transactions, remain active on their social networks, and much more, on the move. 
 
