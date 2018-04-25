@@ -24,6 +24,9 @@
     linkcolor=black,
     urlcolor=black
 }
+\usepackage{tikz}
+\newcommand*\circled[1]{\tikz[baseline=(char.base)]{
+            \node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
  
 \newcommand\myworries[1]{\textcolor{red}{#1}}
 \newcommand{\asd}{AppBox~}
@@ -214,7 +217,7 @@
 \include{1intro/chapter1}
 
 \include{2background/intro}
-\include{2background/analysis}
+%\include{2background/analysis}
 
 \include{3artdroid/artdroid}
 

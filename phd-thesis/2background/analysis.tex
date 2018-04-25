@@ -48,6 +48,7 @@ Statically unavailable arguments can make it impossible for static analysis tool
 
 %We tried to cover different combinations of reflection APIs which could make it hard for static analyzers to detect the information leakage. In the following, we describe how reflection APIs are used in each case.
 
+\iffalse
 \begin{description}[style=unboxed,leftmargin=0cm]
 
 \item \circled{1} MainActivity retrieves the  field \texttt{Str} of BaseClass using \texttt{getField} reflection API. %[Done-Tested]
@@ -85,6 +86,7 @@ In the above case, we use static strings for the names of the class TelephonyMan
 
 \item \circled{14} Decrypts the encrypted names of TelephonyManager class, methods \texttt{getDeviceId} and \texttt{sendTextMessage} using Crypto APIs.
 
+\fi
 
 \end{description}
 
